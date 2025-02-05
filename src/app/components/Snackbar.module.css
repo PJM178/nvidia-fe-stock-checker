@@ -1,4 +1,4 @@
-.error-test-container {
+.snackbar-content-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -7,7 +7,7 @@
   align-items: center;
 }
 
-.error-test-text {
+.snackbar-content-error {
   color: var(--error-text);
   padding: 20px;
   border: var(--error-stroke-weak) 2px solid;
@@ -18,7 +18,7 @@
   width: fit-content;
 }
 
-.warning-test-text {
+.snackbar-content-warning {
   color: var(--warning-text);
   padding: 20px;
   border: var(--warning-stroke-weak) 2px solid;
@@ -29,7 +29,7 @@
   width: fit-content;
 }
 
-.success-test-text {
+.snackbar-content-success {
   color: var(--success-text);
   padding: 20px;
   border: var(--success-stroke-weak) 2px solid;
@@ -40,9 +40,20 @@
   width: fit-content;
 }
 
+.snackbar-content {
+  display: flex;
+  gap: 20px;
+}
+
 .snackbar-container {
   display: flex;
   position: fixed;
   bottom: 50px;
   left: 50px;
+  opacity: 0;
+  transition: opacity 500ms;
+}
+
+.snackbar-container.visible {
+  opacity: 1;
 }

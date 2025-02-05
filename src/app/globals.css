@@ -43,3 +43,13 @@ body {
     color-scheme: dark;
   }
 }
+
+
+.transition-test {
+  width: 0px;
+  transition: width 500ms;
+  transition: opacity 500ms;
+  opacity: 1;
+  height: 20px;
+  background-color: white;
+}

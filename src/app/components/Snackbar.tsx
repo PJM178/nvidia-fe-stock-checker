@@ -3,52 +3,60 @@
 import { useEffect, useState } from "react";
 import styles from "./Snackbar.module.css";
 
-const Snackbar = () => {
-  const [statusText, setStatusText] = useState<number>(0);
+interface SnackbarProps {
+  type: "success" | "warning" | "error" | null;
+  setNotification: React.Dispatch<React.SetStateAction<"success" | "warning" | "error" | null>>;
+}
+
+const SnackbarWrapper = (props: SnackbarProps) => {
+  const { type } = props;
+
+  if (!type) return null;
+
+  return <Snackbar {...props} />;
+}
+
+const Snackbar = (props: SnackbarProps) => {
+  const { type, setNotification } = props;
+  const [isContentOpen, setIsContentOpen] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStatusText(prevValue => {
-        if (prevValue === 3) {
-          return 1;
-        }
+    setIsContentOpen(true);
 
-        return prevValue + 1;
-      });
-    }, 5000);
+    const timeout = setTimeout(() => {
+      setIsContentOpen(false);
+    }, 20000);
 
     return () => {
-      clearInterval(interval);
+      clearTimeout(timeout);
     }
-  });
+  }, [type]);
 
-  if (!statusText) {
-    return null;
-  }
+  const handleTransitionEnd = () => {
+    if (!isContentOpen) {
+      setNotification(null);
+    }
+  };
 
   return (
-    <div className={styles["snackbar-container"]}>
-      <div className={styles["error-test-container"]}>
-        {statusText === 1 &&
-          <div className={styles["error-test-text"]}>
-            This is some error text
+    <div
+      className={`${styles["snackbar-container"]} ${isContentOpen ? styles["visible"] : ""}`}
+      onTransitionEnd={handleTransitionEnd}
+    >
+      <div className={styles["snackbar-content-container"]}>
+        <div className={styles[`snackbar-content-${type}`]}>
+          <div className={styles[`snackbar-content`]}>
+            <div>
+              This is some message
+            </div>
+            <div>
+              cancel
+            </div>
           </div>
-        }
-
-        {statusText === 2 &&
-          <div className={styles["warning-test-text"]}>
-            This is some warning text
-          </div>
-        }
-
-        {statusText === 3 &&
-          <div className={styles["success-test-text"]}>
-            This is some success text
-          </div>
-        }
+        </div>
       </div>
     </div>
   );
 }
 
-export default Snackbar;
+export default SnackbarWrapper;
