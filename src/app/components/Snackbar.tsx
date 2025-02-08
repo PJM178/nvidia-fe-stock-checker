@@ -8,15 +8,15 @@ interface SnackbarProps {
   setNotification: React.Dispatch<React.SetStateAction<"success" | "warning" | "error" | null>>;
 }
 
-const SnackbarWrapper = (props: SnackbarProps) => {
+const Snackbar = (props: SnackbarProps) => {
   const { type } = props;
 
   if (!type) return null;
 
-  return <Snackbar {...props} />;
+  return <SnackbarContent {...props} />;
 }
 
-const Snackbar = (props: SnackbarProps) => {
+const SnackbarContent = (props: SnackbarProps) => {
   const { type, setNotification } = props;
   const [isContentOpen, setIsContentOpen] = useState(false);
 
@@ -59,4 +59,4 @@ const Snackbar = (props: SnackbarProps) => {
   );
 }
 
-export default SnackbarWrapper;
+export default Snackbar;
