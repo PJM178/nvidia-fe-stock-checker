@@ -1,0 +1,28 @@
+.main-content-container {
+  color: var(--text-strong);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sku-grid-table {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.sku-grid-table--row {
+  display: contents;
+}
+
+.sku-grid-table--row:hover .sku-grid-table--item {
+  background-color: blue;
+}
+
+.sku-grid-table--header {
+
+}
+
+.sku-grid-table--item {
+  
+}
