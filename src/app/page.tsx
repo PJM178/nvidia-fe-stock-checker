@@ -1,31 +1,84 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import Snackbar from "./components/Snackbar";
 import styles from "./page.module.css";
+import { Notification, QuestionMark } from "./components/Icons";
 
 const skuData = {
   baseUrl: (sku: string, locale: string) => {
     return `https://api.store.nvidia.com/partner/v1/feinventory?status=1&skus=${sku}&locale=${locale}`
   },
   country: {
-    suomi: {
-      rtx5090: {
-        gpuName: "RTX 5090",
-        skuName: "5090FEPROSHOP",
-        locale: "fi-fi",
-      },
-      rtx5080: {
-        gpuName: "RTX 5080",
-        skuName: "PRO580GFTNV",
-        locale: "fi-fi",
-      },
+    finland: {
+      endonym: "Suomi",
+      skus: {
+        rtx5090: {
+          gpuName: "RTX 5090",
+          skuName: "5090FEPROSHOP",
+          locale: "fi-fi",
+        },
+        rtx5080: {
+          gpuName: "RTX 5080",
+          skuName: "PRO580GFTNV",
+          locale: "fi-fi",
+        },
+      }
+    },
+    germany: {
+      endonym: "Deutschland",
+      skus: {
+        rtx5090: {
+          gpuName: "RTX 5090",
+          skuName: "5090FEPROSHOP",
+          locale: "de-de",
+        },
+        rtx5080: {
+          gpuName: "RTX 5080",
+          skuName: "PRO580GFTNV",
+          locale: "de-de",
+        },
+      }
     },
   },
 };
 
+const mockResponseDataSuccess = {
+  listMap: [
+    {
+      fe_sku: "string",
+      is_active: "true",
+      locale: "string",
+      price: "string",
+      product_url: "www.google.com",
+    }
+  ],
+  map: null,
+  success: true,
+}
+
+const mockResponseDataWarning = {
+  listMap: [
+
+  ],
+  map: null,
+  success: true,
+}
+
+const mockResponseDataError = {
+  error: true,
+  message: "this is mock error",
+};
+
+const makeAbsoluteUrl = (url: string) => {
+  if (!url.match(/^https?:\/\//)) {
+    return `https://${url}`;
+  }
+  
+  return url;
+};
+
 const LocaleBar = () => {
-  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("suomi");
+  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
 
   return null;
 }
@@ -37,24 +90,46 @@ interface SKUProps {
   isActive: boolean;
 }
 
+interface ResponseSkuData {
+  fe_sku: string;
+  is_active: string;
+  locale: string;
+  price: string;
+  product_url: string;
+}
+
+interface ResponseData {
+  listMap: ResponseSkuData[] | [];
+  map: null;
+  success: boolean;
+}
+
+interface ErrorResponse {
+  error: boolean;
+  message: string;
+}
+
+type ApiResponse = ResponseData | ErrorResponse;
+
 const SKU = (props: SKUProps) => {
   const { gpuName, skuName, locale, isActive } = props;
   const [isSelected, setIsSelected] = useState(false);
+  const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(mockResponseDataSuccess);
 
   useEffect(() => {
     if (isActive && isSelected) {
       async function checkStock() {
         const response = await fetch(skuData.baseUrl(skuName, locale));
 
-        const data = await response.json();
-
         if (!response.ok) {
-          console.log(`Error: ${data.message}`);
+          const data: ErrorResponse = await response.json();
+
+          setResponseSkuData({ error: true, message: data.message });
         } else {
-          console.log(data);
+          const data: ResponseData = await response.json();
+
+          setResponseSkuData(data);
         }
-
-
       }
 
       checkStock();
@@ -69,14 +144,58 @@ const SKU = (props: SKUProps) => {
     }
   }
 
-  console.log(isSelected);
+  const apiStatusElement = () => {
+    if (!responseSkuData || "error" in responseSkuData) {
+      return (
+        <div className={styles["sku-response--error"]}></div>
+      );
+    }
+
+    if (responseSkuData.listMap.length === 0) {
+      return (
+        <div className={styles["sku-response--warning"]}></div>
+      );
+    }
+
+    if (responseSkuData.success && responseSkuData.listMap.length > 0) {
+      return (
+        <div className={styles["sku-response--success"]}></div>
+      );
+    }
+  }
+
+  const inStockElement = () => {
+    if (responseSkuData && "success" in responseSkuData && responseSkuData.success && responseSkuData.listMap[0]?.is_active === "true" && responseSkuData.listMap[0]?.product_url.length > 0) {
+      return (
+        <div className={styles["sku-response--success"]}></div>
+      );
+    }
+
+    return (
+      <div className={styles["sku-response--error"]}></div>
+    );
+  }
+
+  const linkElement = () => {
+    if (!responseSkuData || "error" in responseSkuData) {
+      return null;
+    }
+
+    if (responseSkuData.success && responseSkuData.listMap[0]?.is_active === "true" && responseSkuData.listMap[0]?.product_url.length > 0) {
+      return (
+        <a href={makeAbsoluteUrl(responseSkuData.listMap[0].product_url)} target="_blank">Click Me</a>
+      );
+    }
+
+    return null;
+  }
 
   return (
     <div className={styles["sku-grid-table--row"]}>
       <div className={styles["sku-grid-table--item"]}>{gpuName}</div>
-      <div className={styles["sku-grid-table--item"]}>is api reachable</div>
-      <div className={styles["sku-grid-table--item"]}>is in stock</div>
-      <div className={styles["sku-grid-table--item"]}>shop link</div>
+      <div className={styles["sku-grid-table--item"]}>{apiStatusElement()}</div>
+      <div className={styles["sku-grid-table--item"]}>{inStockElement()}</div>
+      <div className={styles["sku-grid-table--item"]}>{linkElement()}</div>
       <div className={styles["sku-grid-table--item"]}>
         <input type="checkbox" onChange={handleSelected} />
       </div>
@@ -98,8 +217,8 @@ const GridTable = (props: GridTableProps) => {
       <div className={styles["sku-grid-table--header"]}>API Status</div>
       <div className={styles["sku-grid-table--header"]}>In Stock</div>
       <div className={styles["sku-grid-table--header"]}>Shop Link</div>
-      <div className={styles["sku-grid-table--header"]}>Bell Icon?</div>
-      {Object.values(skuData.country[country]).map(sku => (
+      <div className={styles["sku-grid-table--header"]}><Notification /></div>
+      {Object.values(skuData.country[country].skus).map(sku => (
         <SKU
           key={sku.skuName}
           isActive={isActive}
@@ -113,26 +232,18 @@ const GridTable = (props: GridTableProps) => {
 };
 
 export default function Home() {
-  const [notification, setNotification] = useState<"warning" | "success" | "error" | null>(null);
-  const [width, setWidth] = useState(0);
-  const [opacity, setOpacity] = useState(1);
-
   return (
     <>
       <main>
         <div className={styles["main-content-container"]}>
-          <h1>Price checker</h1>
+          <h1>Nvidia FE Stock Checker</h1>
+          <div onPointerEnter={() => console.log("lol")}>
+            <QuestionMark />
+          </div>
           <LocaleBar />
-          <GridTable country="suomi" isActive={true} />
-          <button onClick={() => setNotification("success")}>test success</button>
-          <button onClick={() => setNotification("error")}>test error</button>
-          <button onClick={() => setNotification("warning")}>test warning</button>
-          <button onClick={() => setWidth(200)}>set width</button>
-          <button onClick={() => setOpacity(0)}>set op</button>
-          <div className="transition-test" style={{ width: width, opacity: opacity }}></div>
+          <GridTable country="finland" isActive={true} />
         </div>
       </main>
-      <Snackbar type={notification} setNotification={setNotification} />
     </>
   );
 }

@@ -17,12 +17,42 @@
 
 .sku-grid-table--row:hover .sku-grid-table--item {
   background-color: blue;
+  opacity: 0.3;
 }
 
 .sku-grid-table--header {
 
 }
 
+/* .sku-grid-table--header-notification > svg {
+  fill: var(--text-strong);
+  height: 25px;
+} */
+
 .sku-grid-table--item {
   
+}
+
+.sku-response--error {
+  border-radius: 5px;
+  border: solid var(--error-stroke-strong) 2px;
+  background-color: var(--error-text);
+  width: 25px;
+  height: 25px;
+}
+
+.sku-response--warning {
+  border-radius: 5px;
+  border: solid var(--warning-stroke-strong) 2px;
+  background-color: var(--warning-text);
+  width: 25px;
+  height: 25px;
+}
+
+.sku-response--success {
+  border-radius: 5px;
+  border: solid var(--success-stroke-strong) 2px;
+  background-color: var(--success-text);
+  width: 25px;
+  height: 25px;
 }

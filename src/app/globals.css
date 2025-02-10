@@ -62,7 +62,6 @@ body {
   }
 }
 
-
 .transition-test {
   width: 0px;
   transition: width 500ms;
@@ -70,4 +69,10 @@ body {
   opacity: 1;
   height: 20px;
   background-color: white;
+}
+
+.general-icon {
+  fill: var(--text-strong);
+  height: 25px;
+  width: 25px;
 }
