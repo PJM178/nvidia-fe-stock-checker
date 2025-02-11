@@ -1,0 +1,92 @@
+.primary-button {
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.primary-button svg {
+  fill: currentColor;
+}
+
+.primary-button:hover {
+  cursor: pointer;
+}
+
+.primary-button--disabled.primary-button--filled {
+  background-color: var(--stroke-weak) !important;
+  border-color: var(--stroke-weak) !important;;
+  pointer-events: none;
+}
+
+.primary-button--disabled.primary-button--outlined {
+  border-color: var(--stroke-weak) !important;
+  color: var(--stroke-weak) !important;
+  pointer-events: none;
+}
+
+.primary-button--disabled.primary-button--text {
+  color: var(--stroke-weak) !important;
+  pointer-events: none;
+}
+
+.primary-button--disabled:hover {
+  cursor: default;
+}
+
+.primary-button--filled {
+  background-color: var(--brand);
+  border: 2px solid var(--brand);
+  color: var(--fill);
+}
+
+.primary-button--filled:hover {
+  background-color: var(--text-weak);
+  border: 2px solid var(--text-weak);
+  color: var(--fill);
+}
+
+.primary-button--filled:active {
+  background-color: var(--text-strong);
+  border: 2px solid var(--text-strong);
+  color: var(--fill);
+}
+
+.primary-button--outlined {
+  background-color: transparent;
+  border: 2px solid var(--brand);
+  color: var(--brand);
+}
+
+.primary-button--outlined:hover {
+  background-color: transparent;
+  border: 2px solid var(--text-weak);
+  color: var(--text-weak);
+}
+
+.primary-button--outlined:active {
+  background-color: transparent;
+  border: 2px solid var(--text-strong);
+  color: var(--text-strong);
+}
+
+.primary-button--text {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--brand);
+}
+
+.primary-button--text:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-weak);
+}
+
+.primary-button--text:active {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-strong);
+}
+
+.primary-button--icon {
+  display: flex;
+}

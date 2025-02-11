@@ -1,9 +1,14 @@
 .main-content-container {
-  color: var(--text-strong);
+  /* color: var(--text-strong); */
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+}
+
+.locale-bar-container {
+  display: flex;
+  flex-direction: row;
 }
 
 .sku-grid-table {
@@ -55,4 +60,27 @@
   background-color: var(--success-text);
   width: 25px;
   height: 25px;
+}
+
+.locale-start-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  gap: 5px;
+}
+
+.locale-start-button:hover {
+  cursor: pointer;
+}
+
+.locale-start-button--icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  height: 15px;
+  width: 15px;
 }

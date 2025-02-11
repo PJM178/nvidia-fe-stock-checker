@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Notification, QuestionMark } from "./components/Icons";
+import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/Icons";
+import { Button } from "./components/Buttons";
 
 const skuData = {
   baseUrl: (sku: string, locale: string) => {
@@ -22,7 +23,7 @@ const skuData = {
           skuName: "PRO580GFTNV",
           locale: "fi-fi",
         },
-      }
+      },
     },
     germany: {
       endonym: "Deutschland",
@@ -37,7 +38,12 @@ const skuData = {
           skuName: "PRO580GFTNV",
           locale: "de-de",
         },
-      }
+        rtx5070: {
+          gpuName: "RTX TEST",
+          skuName: "PRO570GFTNV",
+          locale: "de-de",
+        },
+      },
     },
   },
 };
@@ -56,31 +62,127 @@ const mockResponseDataSuccess = {
   success: true,
 }
 
-const mockResponseDataWarning = {
-  listMap: [
+// const mockResponseDataWarning = {
+//   listMap: [
 
-  ],
-  map: null,
-  success: true,
-}
+//   ],
+//   map: null,
+//   success: true,
+// }
 
-const mockResponseDataError = {
-  error: true,
-  message: "this is mock error",
-};
+// const mockResponseDataError = {
+//   error: true,
+//   message: "this is mock error",
+// };
 
 const makeAbsoluteUrl = (url: string) => {
   if (!url.match(/^https?:\/\//)) {
     return `https://${url}`;
   }
-  
+
   return url;
 };
 
-const LocaleBar = () => {
-  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
+interface LocaleBarProps {
+  isAlertActive: boolean;
+  setIsAlertActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country>>;
+}
 
-  return null;
+const LocaleBar = (props: LocaleBarProps) => {
+  const { isAlertActive, setIsAlertActive, setChosenCountry } = props;
+
+  const sortedCountries = Object.values(skuData.country).sort((a, b) => {
+    const endonymA = a.endonym.toUpperCase();
+    const endonymB = b.endonym.toUpperCase();
+
+    if (endonymA < endonymB) {
+      return -1;
+    }
+
+    if (endonymA > endonymB) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  const handleCountrySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e);
+    const country = Object.entries(skuData.country).find(([, value]) => value.endonym === e.target.value);
+
+    setChosenCountry(prevValue => {
+      if (country) {
+        return country[0] as keyof typeof skuData.country;
+      }
+
+      return prevValue;
+    })
+  };
+
+  const handleStartTimer = () => {
+    setIsAlertActive(!isAlertActive);
+  }
+
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log(e);
+  };
+
+  return (
+    <div className={styles["locale-bar-container"]}>
+      <select defaultValue={"Suomi"} onChange={handleCountrySelect}>
+        {sortedCountries.map(country => (
+          <option key={country.endonym}>{country.endonym}</option>
+        ))}
+      </select>
+      <Button variant="outlined">
+        outlined
+      </Button>
+      <Button variant="text">
+        text
+      </Button>
+      <Button
+        variant="filled"
+        onClick={handleButtonClick}
+      >
+        filled
+      </Button>
+      <Button variant="outlined" disabled>
+        outlined disabled
+      </Button>
+      <Button variant="text" disabled>
+        text disabled
+      </Button>
+      <Button variant="filled" disabled>
+        filled disabled
+      </Button>
+      <Button variant="filled" startIcon={<StopCircle className={styles["icon"]} />}>
+        <span>filled disabled</span>
+      </Button>
+
+      <Button variant="filled" startIcon={<StopCircle className={styles["icon"]} />}>
+        filled disabled
+      </Button>
+      <Button variant="outlined" startIcon={<StopCircle className={styles["icon"]} />}>
+       <span>outlined disabled</span>
+      </Button>
+      <Button variant="outlined">
+        outlined disabled
+      </Button>
+      <Button variant="text" startIcon={<StopCircle className={styles["icon"]} />}>
+       <span>outlined disabled</span>
+      </Button>
+      <Button variant="text" endIcon={<StopCircle className={styles["icon"]} />}>
+       <span>outlined disabled</span>
+      </Button>
+      <div onClick={handleStartTimer} className={styles["locale-start-button"]}>
+        {!isAlertActive ?
+          <><div>Start</div><div className={styles["locale-start-button--icon-container"]}><PlayArrow className={styles["icon"]} /></div></> :
+          <>Stop <StopCircle className={styles["icon"]} /></>}
+      </div>
+
+    </div>
+  );
 }
 
 interface SKUProps {
@@ -232,6 +334,31 @@ const GridTable = (props: GridTableProps) => {
 };
 
 export default function Home() {
+  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
+  const [isAlertActive, setIsAlertActive] = useState(false);
+
+  const handleThemeDark = () => {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", "dark");
+  }
+
+  const handleThemeLight = () => {
+    document.body.classList.toggle("light-mode");
+    localStorage.setItem("theme", "light");
+  }
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark-mode");
+    }
+
+    if (savedTheme === "light") {
+      document.body.classList.add("light-mode");
+    }
+  }, []);
+
   return (
     <>
       <main>
@@ -240,9 +367,15 @@ export default function Home() {
           <div onPointerEnter={() => console.log("lol")}>
             <QuestionMark />
           </div>
-          <LocaleBar />
-          <GridTable country="finland" isActive={true} />
+          <LocaleBar
+            setChosenCountry={setChosenCountry}
+            setIsAlertActive={setIsAlertActive}
+            isAlertActive={isAlertActive}
+          />
+          <GridTable country={chosenCountry} isActive={isAlertActive} />
         </div>
+        <button onClick={handleThemeLight}>light theme</button>
+        <button onClick={handleThemeDark}>dark theme</button>
       </main>
     </>
   );
