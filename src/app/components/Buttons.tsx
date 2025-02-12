@@ -25,10 +25,10 @@ export const Button = (props: ButtonProps) => {
       onClick={onClick}
     >
       {startIcon && 
-      <span className={styles["primary-button--icon"]}>{startIcon}</span>}
+      <span className={`${styles["primary-button--icon"]} ${styles["start"]}`}>{startIcon}</span>}
       {children}
       {endIcon && 
-      <span className={styles["primary-button--icon"]}>{endIcon}</span>}
+      <span className={`${styles["primary-button--icon"]} ${styles["end"]}`}>{endIcon}</span>}
     </button>
   );
 };

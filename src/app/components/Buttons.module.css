@@ -90,3 +90,11 @@
 .primary-button--icon {
   display: flex;
 }
+
+.primary-button--icon.end {
+  margin-left: 0.25rem;
+}
+
+.primary-button--icon.start {
+  margin-right: 0.25rem;
+}

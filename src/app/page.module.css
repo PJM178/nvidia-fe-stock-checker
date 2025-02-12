@@ -4,16 +4,21 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  width: fit-content;
 }
 
 .locale-bar-container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin: 10px 0;
 }
 
 .sku-grid-table {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
 }
 
 .sku-grid-table--row {
@@ -26,7 +31,9 @@
 }
 
 .sku-grid-table--header {
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* .sku-grid-table--header-notification > svg {
@@ -35,7 +42,9 @@
 } */
 
 .sku-grid-table--item {
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .sku-response--error {

@@ -15,7 +15,7 @@ const skuData = {
       skus: {
         rtx5090: {
           gpuName: "RTX 5090",
-          skuName: "5090FEPROSHOP",
+          skuName: "Pro5090FE",
           locale: "fi-fi",
         },
         rtx5080: {
@@ -108,7 +108,6 @@ const LocaleBar = (props: LocaleBarProps) => {
   });
 
   const handleCountrySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(e);
     const country = Object.entries(skuData.country).find(([, value]) => value.endonym === e.target.value);
 
     setChosenCountry(prevValue => {
@@ -120,12 +119,8 @@ const LocaleBar = (props: LocaleBarProps) => {
     })
   };
 
-  const handleStartTimer = () => {
+  const handleButtonClick = () => {
     setIsAlertActive(!isAlertActive);
-  }
-
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log(e);
   };
 
   return (
@@ -135,52 +130,25 @@ const LocaleBar = (props: LocaleBarProps) => {
           <option key={country.endonym}>{country.endonym}</option>
         ))}
       </select>
-      <Button variant="outlined">
-        outlined
-      </Button>
-      <Button variant="text">
-        text
-      </Button>
-      <Button
-        variant="filled"
-        onClick={handleButtonClick}
-      >
-        filled
-      </Button>
-      <Button variant="outlined" disabled>
-        outlined disabled
-      </Button>
-      <Button variant="text" disabled>
-        text disabled
-      </Button>
-      <Button variant="filled" disabled>
-        filled disabled
-      </Button>
-      <Button variant="filled" startIcon={<StopCircle className={styles["icon"]} />}>
-        <span>filled disabled</span>
-      </Button>
-
-      <Button variant="filled" startIcon={<StopCircle className={styles["icon"]} />}>
-        filled disabled
-      </Button>
-      <Button variant="outlined" startIcon={<StopCircle className={styles["icon"]} />}>
-       <span>outlined disabled</span>
-      </Button>
-      <Button variant="outlined">
-        outlined disabled
-      </Button>
-      <Button variant="text" startIcon={<StopCircle className={styles["icon"]} />}>
-       <span>outlined disabled</span>
-      </Button>
-      <Button variant="text" endIcon={<StopCircle className={styles["icon"]} />}>
-       <span>outlined disabled</span>
-      </Button>
-      <div onClick={handleStartTimer} className={styles["locale-start-button"]}>
-        {!isAlertActive ?
-          <><div>Start</div><div className={styles["locale-start-button--icon-container"]}><PlayArrow className={styles["icon"]} /></div></> :
-          <>Stop <StopCircle className={styles["icon"]} /></>}
-      </div>
-
+      {!isAlertActive ?
+        <>
+          <Button
+            variant="outlined"
+            endIcon={<PlayArrow className={styles["icon"]} />}
+            onClick={handleButtonClick}
+          >
+            <span>Start</span>
+          </Button>
+        </> :
+        <>
+          <Button
+            variant="outlined"
+            endIcon={<StopCircle className={styles["icon"]} />}
+            onClick={handleButtonClick}
+          >
+            <span>Stop</span>
+          </Button>
+        </>}
     </div>
   );
 }
@@ -373,9 +341,9 @@ export default function Home() {
             isAlertActive={isAlertActive}
           />
           <GridTable country={chosenCountry} isActive={isAlertActive} />
+          <button onClick={handleThemeLight}>light theme</button>
+          <button onClick={handleThemeDark}>dark theme</button>
         </div>
-        <button onClick={handleThemeLight}>light theme</button>
-        <button onClick={handleThemeDark}>dark theme</button>
       </main>
     </>
   );
