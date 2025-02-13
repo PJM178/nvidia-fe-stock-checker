@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/Icons";
 import { Button } from "./components/Buttons";
+import { useCountdown } from "./hooks/useCountdown";
 
 const skuData = {
   baseUrl: (sku: string, locale: string) => {
@@ -17,11 +18,13 @@ const skuData = {
           gpuName: "RTX 5090",
           skuName: "Pro5090FE",
           locale: "fi-fi",
+          updated: "12.2.2025",
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
           locale: "fi-fi",
+          updated: "12.2.2025",
         },
       },
     },
@@ -32,16 +35,19 @@ const skuData = {
           gpuName: "RTX 5090",
           skuName: "5090FEPROSHOP",
           locale: "de-de",
+          updated: "12.2.2025",
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
           locale: "de-de",
+          updated: "12.2.2025",
         },
         rtx5070: {
           gpuName: "RTX TEST",
           skuName: "PRO570GFTNV",
           locale: "de-de",
+          updated: "12.2.2025",
         },
       },
     },
@@ -91,6 +97,7 @@ interface LocaleBarProps {
 
 const LocaleBar = (props: LocaleBarProps) => {
   const { isAlertActive, setIsAlertActive, setChosenCountry } = props;
+  const { timeLeft } = useCountdown({ startTime: 20, repeat: true });
 
   const sortedCountries = Object.values(skuData.country).sort((a, b) => {
     const endonymA = a.endonym.toUpperCase();
@@ -125,7 +132,7 @@ const LocaleBar = (props: LocaleBarProps) => {
 
   return (
     <div className={styles["locale-bar-container"]}>
-      <select defaultValue={"Suomi"} onChange={handleCountrySelect}>
+      <select className={styles["locale-bar--select-menu"]} defaultValue={"Suomi"} onChange={handleCountrySelect}>
         {sortedCountries.map(country => (
           <option key={country.endonym}>{country.endonym}</option>
         ))}
@@ -136,6 +143,7 @@ const LocaleBar = (props: LocaleBarProps) => {
             variant="outlined"
             endIcon={<PlayArrow className={styles["icon"]} />}
             onClick={handleButtonClick}
+            className={styles["primary-button"]}
           >
             <span>Start</span>
           </Button>
@@ -145,10 +153,19 @@ const LocaleBar = (props: LocaleBarProps) => {
             variant="outlined"
             endIcon={<StopCircle className={styles["icon"]} />}
             onClick={handleButtonClick}
+            className={styles["primary-button"]}
           >
             <span>Stop</span>
           </Button>
         </>}
+      <div className={styles["timer-container"]}>
+        <span className={styles["timer-container--inner"]}>
+          <span className={styles["timer-container--inner-container"]}>
+            <span>Refresh in&nbsp;</span>
+            <span>{timeLeft < 10 ? "0" + timeLeft : timeLeft}s</span>
+          </span>
+        </span>
+      </div>
     </div>
   );
 }
@@ -183,11 +200,12 @@ type ApiResponse = ResponseData | ErrorResponse;
 
 const SKU = (props: SKUProps) => {
   const { gpuName, skuName, locale, isActive } = props;
-  const [isSelected, setIsSelected] = useState(false);
+  // const [isSelected, setIsSelected] = useState(false);
+  const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(mockResponseDataSuccess);
 
   useEffect(() => {
-    if (isActive && isSelected) {
+    if (isActive && isSelected.current) {
       async function checkStock() {
         const response = await fetch(skuData.baseUrl(skuName, locale));
 
@@ -204,13 +222,15 @@ const SKU = (props: SKUProps) => {
 
       checkStock();
     }
-  }, [isActive, isSelected, locale, skuName]);
+  }, [isActive, locale, skuName]);
 
   function handleSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
-      setIsSelected(true);
+      // setIsSelected(true);
+      isSelected.current = true;
     } else {
-      setIsSelected(false);
+      // setIsSelected(false);
+      isSelected.current = false;
     }
   }
 
@@ -301,6 +321,9 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
+// Check store api page for real sku names
+// if they differ from the list, update the sku names
+// offer user ability to manually override the sku name if empty list is returned
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);
@@ -326,6 +349,25 @@ export default function Home() {
       document.body.classList.add("light-mode");
     }
   }, []);
+
+  // useEffect(() => {
+  //   async function checkStock() {
+  //     const response = await fetch("https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=en-us&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU");
+
+  //     if (!response.ok) {
+  //       const data: ErrorResponse = await response.json();
+
+  //       console.log(data)
+  //     } else {
+  //       const data: ResponseData = await response.json();
+
+  //       console.log(data);
+  //     }
+  //   }
+
+  //   checkStock();
+
+  // }, []);
 
   return (
     <>
