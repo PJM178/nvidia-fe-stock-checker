@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./page.module.css";
 import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/Icons";
 import { Button } from "./components/Buttons";
@@ -81,6 +81,7 @@ const mockResponseDataSuccess = {
 //   message: "this is mock error",
 // };
 
+// If the ulr doesn't have https protocol, append it to the url
 const makeAbsoluteUrl = (url: string) => {
   if (!url.match(/^https?:\/\//)) {
     return `https://${url}`;
@@ -89,15 +90,31 @@ const makeAbsoluteUrl = (url: string) => {
   return url;
 };
 
+interface TimerProps {
+  setShouldRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Timer = (props: TimerProps) => {
+  const { setShouldRefresh } = props;
+
+  const handleUseCountdownCallback = useCallback(() => {
+    setShouldRefresh((prevValue) => !prevValue);
+  }, [setShouldRefresh]);
+
+  const { timeLeft } = useCountdown({ startTime: 5, repeat: true, callback: handleUseCountdownCallback });
+
+  return timeLeft < 10 ? "0" + timeLeft : timeLeft;
+};
+
 interface LocaleBarProps {
   isAlertActive: boolean;
   setIsAlertActive: React.Dispatch<React.SetStateAction<boolean>>;
   setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country>>;
+  setShouldRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const LocaleBar = (props: LocaleBarProps) => {
-  const { isAlertActive, setIsAlertActive, setChosenCountry } = props;
-  const { timeLeft } = useCountdown({ startTime: 20, repeat: true });
+  const { isAlertActive, setIsAlertActive, setChosenCountry, setShouldRefresh } = props;
 
   const sortedCountries = Object.values(skuData.country).sort((a, b) => {
     const endonymA = a.endonym.toUpperCase();
@@ -162,7 +179,7 @@ const LocaleBar = (props: LocaleBarProps) => {
         <span className={styles["timer-container--inner"]}>
           <span className={styles["timer-container--inner-container"]}>
             <span>Refresh in&nbsp;</span>
-            <span>{timeLeft < 10 ? "0" + timeLeft : timeLeft}s</span>
+            <span><Timer setShouldRefresh={setShouldRefresh} />s</span>
           </span>
         </span>
       </div>
@@ -200,7 +217,6 @@ type ApiResponse = ResponseData | ErrorResponse;
 
 const SKU = (props: SKUProps) => {
   const { gpuName, skuName, locale, isActive } = props;
-  // const [isSelected, setIsSelected] = useState(false);
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(mockResponseDataSuccess);
 
@@ -226,10 +242,8 @@ const SKU = (props: SKUProps) => {
 
   function handleSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
-      // setIsSelected(true);
       isSelected.current = true;
     } else {
-      // setIsSelected(false);
       isSelected.current = false;
     }
   }
@@ -280,9 +294,17 @@ const SKU = (props: SKUProps) => {
     return null;
   }
 
+  const handleAPIElement = useCallback((skuName?: string, apiSkuName?: string) => {
+    if (skuName === apiSkuName) return null;
+  
+    return <span className={styles["sku-grid-table--item-gpuname-api"]}>API</span>;
+  }, []);
+
   return (
     <div className={styles["sku-grid-table--row"]}>
-      <div className={styles["sku-grid-table--item"]}>{gpuName}</div>
+      <div className={styles["sku-grid-table--item"]}>
+        <span className={styles["sku-grid-table--item-gpuname-container"]}>{gpuName}{handleAPIElement()}</span>
+      </div>
       <div className={styles["sku-grid-table--item"]}>{apiStatusElement()}</div>
       <div className={styles["sku-grid-table--item"]}>{inStockElement()}</div>
       <div className={styles["sku-grid-table--item"]}>{linkElement()}</div>
@@ -327,7 +349,8 @@ const GridTable = (props: GridTableProps) => {
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);
-
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  console.log(shouldRefresh);
   const handleThemeDark = () => {
     document.body.classList.toggle("dark-mode");
     localStorage.setItem("theme", "dark");
@@ -369,6 +392,10 @@ export default function Home() {
 
   // }, []);
 
+  useEffect(() => {
+    console.log("this is refresh from timer");
+  }, [shouldRefresh]);
+
   return (
     <>
       <main>
@@ -381,6 +408,7 @@ export default function Home() {
             setChosenCountry={setChosenCountry}
             setIsAlertActive={setIsAlertActive}
             isAlertActive={isAlertActive}
+            setShouldRefresh={setShouldRefresh}
           />
           <GridTable country={chosenCountry} isActive={isAlertActive} />
           <button onClick={handleThemeLight}>light theme</button>

@@ -120,3 +120,11 @@ button.primary-button {
 .locale-bar--select-menu {
   padding: 10px;
 }
+
+.sku-grid-table--item-gpuname-container {
+  position: relative;
+}
+
+.sku-grid-table--item-gpuname-api {
+  position: absolute;
+}
