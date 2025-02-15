@@ -6,6 +6,12 @@ import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/
 import { Button } from "./components/Buttons";
 import { useCountdown } from "./hooks/useCountdown";
 
+interface SkuData {
+  gpuName: string;
+  skuName: string;
+  isUpdated: boolean;
+}
+
 const skuData = {
   baseUrl: (sku: string, locale: string) => {
     return `https://api.store.nvidia.com/partner/v1/feinventory?status=1&skus=${sku}&locale=${locale}`
@@ -17,39 +23,36 @@ const skuData = {
         rtx5090: {
           gpuName: "RTX 5090",
           skuName: "Pro5090FE",
-          locale: "fi-fi",
-          updated: "12.2.2025",
+          isUpdated: false,
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
-          locale: "fi-fi",
-          updated: "12.2.2025",
+          isUpdated: false,
         },
       },
+      locale: "fi-fi",
     },
     germany: {
       endonym: "Deutschland",
       skus: {
-        rtx5090: {
-          gpuName: "RTX 5090",
-          skuName: "5090FEPROSHOP",
-          locale: "de-de",
-          updated: "12.2.2025",
+        // rtx5090: {
+        //   gpuName: "RTX 5090",
+        //   skuName: "5090FEPROSHOP",
+        //   isUpdated: false,
+        // },
+        rtx5070: {
+          gpuName: "RTX 5070",
+          skuName: "PRO570GFTNV",
+          isUpdated: false,
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
-          locale: "de-de",
-          updated: "12.2.2025",
-        },
-        rtx5070: {
-          gpuName: "RTX TEST",
-          skuName: "PRO570GFTNV",
-          locale: "de-de",
-          updated: "12.2.2025",
+          isUpdated: false,
         },
       },
+      locale: "de-de",
     },
   },
 };
@@ -66,7 +69,186 @@ const mockResponseDataSuccess = {
   ],
   map: null,
   success: true,
-}
+};
+
+const mockApiResponseData = [
+  {
+      "displayName": "NVIDIA RTX 5080",
+      "totalCount": 2,
+      "productID": 1147557,
+      "imageURL": "https://assets.nvidia.partners/images/png/RTX5080-3QTR-Back-Right.png",
+      "productTitle": "NVIDIA GeForce RTX 5080",
+      "digitialRiverID": "",
+      "productSKU": "PRO580GFTNV",
+      "productUPC": "PRO580GFTNV_FI",
+      "productUPCOriginal": "PRO580GFTNV",
+      "productPrice": "€1,229.00",
+      "mrp": "1229.0",
+      "productAvailable": false,
+      "productRating": null,
+      "customerReviewCount": null,
+      "isFounderEdition": true,
+      "isFeaturedProduct": false,
+      "certified": false,
+      "bcPID": 0,
+      "manufacturer": "NVIDIA",
+      "locale": "FI",
+      "bestSeller": false,
+      "isFeaturedProdcutFoundInSecondSearch": false,
+      "category": "GPU",
+      "gpu": "RTX 5080",
+      "purchaseOption": "",
+      "prdStatus": "out_of_stock",
+      "minShipDays": null,
+      "maxShipDays": null,
+      "shipInfo": null,
+      "isOffer": false,
+      "offerText": "",
+      "internalLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5080/",
+      "retailers": [
+          {
+              "productId": 1147557,
+              "productTitle": "NVIDIA GeForce RTX 5080",
+              "logoUrl": null,
+              "isAvailable": true,
+              "salePrice": "1229.0",
+              "directPurchaseLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5080/",
+              "purchaseLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5080/",
+              "hasOffer": false,
+              "offerText": null,
+              "partnerId": "111",
+              "storeId": "9619",
+              "upc": "PRO580GFTNV_FI",
+              "sku": "PRO580GFTNV",
+              "stock": 0,
+              "retailerName": "",
+              "type": 80,
+              "mrp": "1229.0",
+              "bestSeller": false
+          }
+      ],
+      "productInfo": [
+          {
+              "name": "gpu_boost_clock_speed",
+              "value": "2.62 GHz"
+          },
+          {
+              "name": "gpu_memory_size",
+              "value": "16 GB"
+          },
+          {
+              "name": "cooling_system",
+              "value": "Aktiivinen"
+          }
+      ],
+      "compareProductInfo": [
+          {
+              "name": "gpu_clock_speed",
+              "value": "--"
+          },
+          {
+              "name": "gpu_boost_clock_speed",
+              "value": "2.62 GHz"
+          },
+          {
+              "name": "gpu_memory_size",
+              "value": "16 GB"
+          },
+          {
+              "name": "cooling_system",
+              "value": "Aktiivinen"
+          }
+      ]
+  },
+  {
+      "displayName": "NVIDIA RTX 5090",
+      "totalCount": 2,
+      "productID": 1147616,
+      "imageURL": "https://assets.nvidia.partners/images/png/RTX5090-3QTR-Back-Right.png",
+      "productTitle": "NVIDIA GeForce RTX 5090",
+      "digitialRiverID": "",
+      "productSKU": "Pro5090FE",
+      "productUPC": "Pro5090FE_FI",
+      "productUPCOriginal": "Pro5090FE",
+      "productPrice": "€2,455.00",
+      "mrp": "2455.0",
+      "productAvailable": false,
+      "productRating": null,
+      "customerReviewCount": null,
+      "isFounderEdition": true,
+      "isFeaturedProduct": false,
+      "certified": false,
+      "bcPID": 0,
+      "manufacturer": "NVIDIA",
+      "locale": "FI",
+      "bestSeller": false,
+      "isFeaturedProdcutFoundInSecondSearch": false,
+      "category": "GPU",
+      "gpu": "RTX 5090",
+      "purchaseOption": "",
+      "prdStatus": "out_of_stock",
+      "minShipDays": null,
+      "maxShipDays": null,
+      "shipInfo": null,
+      "isOffer": false,
+      "offerText": "",
+      "internalLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5090/",
+      "retailers": [
+          {
+              "productId": 1147616,
+              "productTitle": "NVIDIA GeForce RTX 5090",
+              "logoUrl": null,
+              "isAvailable": true,
+              "salePrice": "2455.0",
+              "directPurchaseLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5090/",
+              "purchaseLink": "https://marketplace.nvidia.com/fi-fi/consumer/graphics-cards/nvidia-geforce-rtx-5090/",
+              "hasOffer": false,
+              "offerText": null,
+              "partnerId": "111",
+              "storeId": "9619",
+              "upc": "Pro5090FE_FI",
+              "sku": "Pro5090FE",
+              "stock": 0,
+              "retailerName": "",
+              "type": 80,
+              "mrp": "2455.0",
+              "bestSeller": false
+          }
+      ],
+      "productInfo": [
+          {
+              "name": "gpu_boost_clock_speed",
+              "value": "2.41 GHz"
+          },
+          {
+              "name": "gpu_memory_size",
+              "value": "32 GB"
+          },
+          {
+              "name": "cooling_system",
+              "value": "Aktiivinen"
+          }
+      ],
+      "compareProductInfo": [
+          {
+              "name": "gpu_clock_speed",
+              "value": "--"
+          },
+          {
+              "name": "gpu_boost_clock_speed",
+              "value": "2.41 GHz"
+          },
+          {
+              "name": "gpu_memory_size",
+              "value": "32 GB"
+          },
+          {
+              "name": "cooling_system",
+              "value": "Aktiivinen"
+          }
+      ]
+  }
+];
 
 // const mockResponseDataWarning = {
 //   listMap: [
@@ -294,11 +476,11 @@ const SKU = (props: SKUProps) => {
     return null;
   }
 
-  const handleAPIElement = useCallback((skuName?: string, apiSkuName?: string) => {
+  const handleAPIElement = (skuName?: string, apiSkuName?: string) => {
     if (skuName === apiSkuName) return null;
-  
+
     return <span className={styles["sku-grid-table--item-gpuname-api"]}>API</span>;
-  }, []);
+  };
 
   return (
     <div className={styles["sku-grid-table--row"]}>
@@ -318,10 +500,65 @@ const SKU = (props: SKUProps) => {
 interface GridTableProps {
   isActive: boolean;
   country: keyof typeof skuData.country;
+  apiSkuData: ApiSkuData;
 }
 
 const GridTable = (props: GridTableProps) => {
-  const { isActive, country } = props;
+  const { isActive, country, apiSkuData } = props;
+
+  function checkIfIsInData() {
+    if (!apiSkuData.isLoading) {
+      const skuDataList = [...Object.values(skuData.country[country].skus)];
+      let apiSkuDataList = apiSkuData.data;
+      const updatedSkuList: SkuData[] = [];
+  
+      skuDataList.forEach((sku) => {
+        const clonedSku = { ...sku };
+        const result = apiSkuDataList.find((gpu) => 
+          typeof gpu === "object" && gpu !== null && "gpu" in gpu && gpu.gpu === sku.gpuName
+        );
+
+        if (sku.gpuName ===  (result as { gpu: string })?.gpu) {
+          clonedSku.isUpdated = (result as { productSKU: string })?.productSKU !== sku.skuName;
+          clonedSku.skuName = (result as { productSKU: string })?.productSKU;
+        }
+
+        updatedSkuList.push(clonedSku);
+        apiSkuDataList = apiSkuDataList.filter((apiSku) => (apiSku as { gpu: string }).gpu !== sku.gpuName);
+      });
+  
+      if (apiSkuDataList.length > 0) {
+        apiSkuDataList.forEach((sku) => {
+          const toInsertSku: SkuData = {
+            isUpdated: true,
+            gpuName: (sku as { gpu: string }).gpu,
+            skuName: (sku as { productSKU: string }).productSKU,
+          };
+
+          updatedSkuList.push(toInsertSku);
+        });
+      }
+
+      updatedSkuList.sort((a, b) => {
+        const gpuA = a.gpuName;
+        const gpuB = b.gpuName;
+    
+        if (gpuA > gpuB) {
+          return -1;
+        }
+    
+        if (gpuA < gpuB) {
+          return 1;
+        }
+    
+        return 0;
+      }) 
+
+      console.log(updatedSkuList);
+    }
+  };
+
+  checkIfIsInData();
 
   return (
     <div className={styles["sku-grid-table"]}>
@@ -336,12 +573,17 @@ const GridTable = (props: GridTableProps) => {
           isActive={isActive}
           skuName={sku.skuName}
           gpuName={sku.gpuName}
-          locale={sku.locale}
+          locale={skuData.country[country].locale}
         />
       ))}
     </div>
   );
 };
+
+interface ApiSkuData {
+  isLoading: boolean;
+  data: unknown[];
+}
 
 // Check store api page for real sku names
 // if they differ from the list, update the sku names
@@ -350,7 +592,8 @@ export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-  console.log(shouldRefresh);
+  const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });
+  console.log(Object.values(skuData.country[chosenCountry].skus));
   const handleThemeDark = () => {
     document.body.classList.toggle("dark-mode");
     localStorage.setItem("theme", "dark");
@@ -373,28 +616,34 @@ export default function Home() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   async function checkStock() {
-  //     const response = await fetch("https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=en-us&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU");
-
-  //     if (!response.ok) {
-  //       const data: ErrorResponse = await response.json();
-
-  //       console.log(data)
-  //     } else {
-  //       const data: ResponseData = await response.json();
-
-  //       console.log(data);
-  //     }
-  //   }
-
-  //   checkStock();
-
-  // }, []);
-
   useEffect(() => {
-    console.log("this is refresh from timer");
-  }, [shouldRefresh]);
+    async function checkStock() {
+      // setApiSkuData({ isLoading: true, data: apiSkuData.data });
+      // const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
+
+      // if (!response.ok) {
+      //   const data: ErrorResponse = await response.json();
+
+      //   console.log(data)
+      // } else {
+      //   const data = await response.json();
+
+      //   setApiSkuData({ isLoading: false, data: data.searchedProducts.productDetails });
+      // }
+      setApiSkuData((prevValue) => {
+        prevValue.isLoading = true;
+
+        return { ...prevValue };
+      });
+
+      setTimeout(() => {
+        setApiSkuData({ isLoading: false, data: mockApiResponseData })
+      }, 2000);
+    }
+
+    checkStock();
+
+  }, [shouldRefresh, chosenCountry]);
 
   return (
     <>
@@ -410,7 +659,7 @@ export default function Home() {
             isAlertActive={isAlertActive}
             setShouldRefresh={setShouldRefresh}
           />
-          <GridTable country={chosenCountry} isActive={isAlertActive} />
+          <GridTable apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <button onClick={handleThemeLight}>light theme</button>
           <button onClick={handleThemeDark}>dark theme</button>
         </div>
