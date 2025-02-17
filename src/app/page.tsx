@@ -10,6 +10,7 @@ import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
   GridTableProps, ApiSkuData
 } from "./page.types";
+import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 
 export const skuData = {
   baseUrl: (sku: string, locale: string) => {
@@ -23,11 +24,13 @@ export const skuData = {
           gpuName: "RTX 5090",
           skuName: "Pro5090FE",
           isUpdated: false,
+          isFromApi: false,
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
           isUpdated: false,
+          isFromApi: false,
         },
       },
       locale: "fi-fi",
@@ -39,16 +42,19 @@ export const skuData = {
         //   gpuName: "RTX 5090",
         //   skuName: "5090FEPROSHOP",
         //   isUpdated: false,
+        //   isFromApi: false,
         // },
         rtx5070: {
           gpuName: "RTX 5070",
           skuName: "PRO570GFTNV",
           isUpdated: false,
+          isFromApi: false,
         },
         rtx5080: {
           gpuName: "RTX 5080",
           skuName: "PRO580GFTNV",
           isUpdated: false,
+          isFromApi: false,
         },
       },
       locale: "de-de",
@@ -505,12 +511,64 @@ const GridTable = (props: GridTableProps) => {
 
   checkIfIsInData();
 
+  const handlePopoverContent = (element: "api" | "stock" | "link") => {
+    if (element === "api") {
+      return (
+        <div>
+          API INFO
+        </div>
+      );
+    }
+
+    if (element === "stock") {
+      return (
+        <div>
+          STOCK INFO
+        </div>
+      );
+    }
+
+    if (element === "link") {
+      return (
+        <div>
+          LINK INFO
+        </div>
+      );
+    }
+  }
+
   return (
     <div className={styles["sku-grid-table"]}>
       <div className={styles["sku-grid-table--header"]}>Item</div>
-      <div className={styles["sku-grid-table--header"]}>API Status</div>
-      <div className={styles["sku-grid-table--header"]}>In Stock</div>
-      <div className={styles["sku-grid-table--header"]}>Shop Link</div>
+      <div className={styles["sku-grid-table--header"]}>
+        API Status
+        <InlinePointerEnterAndLeaveWrapper
+          className={styles["sku-grid-table--header-icon"]}
+          popoverContent={handlePopoverContent("api")}
+        >
+          <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
+        </InlinePointerEnterAndLeaveWrapper>
+      </div>
+      <div className={styles["sku-grid-table--header"]}>
+        In Stock
+        <InlinePointerEnterAndLeaveWrapper
+          className={styles["sku-grid-table--header-icon"]}
+          popoverContent={handlePopoverContent("stock")}
+        >
+          <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
+        </InlinePointerEnterAndLeaveWrapper>
+      </div>
+      <div
+        className={styles["sku-grid-table--header"]}
+      >
+        Shop Link
+        <InlinePointerEnterAndLeaveWrapper
+          className={styles["sku-grid-table--header-icon"]}
+          popoverContent={handlePopoverContent("link")}
+        >
+          <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
+        </InlinePointerEnterAndLeaveWrapper>
+      </div>
       <div className={styles["sku-grid-table--header"]}><Notification /></div>
       {Object.values(skuData.country[country].skus).map(sku => (
         <SKU
@@ -592,9 +650,6 @@ export default function Home() {
       <main>
         <div className={styles["main-content-container"]}>
           <h1>Nvidia FE Stock Checker</h1>
-          <div onPointerEnter={() => console.log("lol")}>
-            <QuestionMark />
-          </div>
           <LocaleBar
             setChosenCountry={setChosenCountry}
             setIsAlertActive={setIsAlertActive}

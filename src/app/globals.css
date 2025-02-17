@@ -112,10 +112,21 @@ body {
   transition: background-color 300ms, color 300ms;
 }
 
+@media (max-width: 600px) {
+  /* Styles for screens with width less than 600px */
+  body {
+    margin: unset;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
+}
+
+h1 {
+  text-align: center;
 }
 
 .transition-test {

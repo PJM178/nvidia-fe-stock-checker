@@ -1,0 +1,18 @@
+.popover-container {
+  position: fixed;
+  inset: 0px;
+  z-index: 1000;
+}
+
+.popover-container--close-popover {
+  position: fixed;
+  inset: 0px;
+  z-index: -1;
+}
+
+.popover-container--popover {
+  position: absolute;
+  background-color: var(--stroke-weak);
+  border-radius: 5px;
+  padding: 5px;
+}
