@@ -37,7 +37,7 @@ const Popover = (props: PopoverProps) => {
           <div className={styles["popover-container"]}>
             <div
               className={styles["popover-container--close-popover"]}
-              onClick={(e) => handleOnClick(e)}
+              onClick={handleOnClick}
             />
             <div ref={contentRef} className={styles["popover-container--popover"]}>
               {children}

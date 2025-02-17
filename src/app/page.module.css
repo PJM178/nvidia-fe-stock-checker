@@ -56,6 +56,14 @@
 .sku-grid-table--header-icon {
   display: inline-flex;
   margin-left: 0.10rem;
+  border-radius: 4px;
+}
+
+.sku-grid-table--header-icon:focus-visible {
+  outline-style: solid;
+  outline-color: var(--brand);
+  outline-offset: 2px;
+  outline-width: 2px;
 }
 
 .sku-grid-table--header-icon-icon:hover {

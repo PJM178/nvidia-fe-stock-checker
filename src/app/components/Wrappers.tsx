@@ -13,6 +13,7 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
   const elementRef = useRef<HTMLElement>(null);
 
   const handleClick = () => {
+    console.log("whayt")
     setAnchorEl(elementRef.current);
   }
 
@@ -20,11 +21,28 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
     setAnchorEl(null);
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.code === "Enter" || e.code === "Space") {
+      if (anchorEl) {
+        return setAnchorEl(null);
+      }
+
+      handleClick();
+    } else {
+      setAnchorEl(null);
+    }
+  }
+
   return (
     <span
       ref={elementRef}
       className={className}
       onClick={handleClick}
+      tabIndex={0}
+      role="button"
+      aria-label="Opens more info popup"
+      aria-haspopup={true}
+      onKeyDown={handleKeyDown}
     >
       {children}
       {popoverContent && anchorEl && <Popover anchorEl={anchorEl} onClose={onClose}>
