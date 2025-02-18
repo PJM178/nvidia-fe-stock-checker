@@ -514,24 +514,47 @@ const GridTable = (props: GridTableProps) => {
   const handlePopoverContent = (element: "api" | "stock" | "link") => {
     if (element === "api") {
       return (
-        <div>
-          API INFO
+        <div className={styles["sku-popover--container"]}>
+          <div className={styles["sku-popover--header"]}>Status info:</div>
+          <div className={styles["sku-popover--content-row"]}>
+            <div className={styles["sku-response--success"]} />
+            <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>successfully got a response from the Nvidia API endpoint</span></span>
+          </div>
+          <div className={styles["sku-popover--content-row"]}>
+            <div className={styles["sku-response--warning"]} />
+            <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>got a response from the endpoint but the product data is missing</span></span>
+          </div>
+          <div className={styles["sku-popover--content-row"]}>
+            <div className={styles["sku-response--error"]} />
+            <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>something went wrong making a call to the endpoint</span></span>
+          </div>
         </div>
       );
     }
 
     if (element === "stock") {
       return (
-        <div>
-          STOCK INFO
+        <div className={styles["sku-popover--container"]}>
+          <div className={styles["sku-popover--header"]}>Status info:</div>
+          <div className={styles["sku-popover--content-row"]}>
+            <div className={styles["sku-response--success"]} />
+            <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>the product is in stock</span></span>
+          </div>
+          <div className={styles["sku-popover--content-row"]}>
+            <div className={styles["sku-response--error"]} />
+            <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>the product is not in stock</span></span>
+          </div>
         </div>
       );
     }
 
     if (element === "link") {
       return (
-        <div>
-          LINK INFO
+        <div className={styles["sku-popover--container"]}>
+          <div className={styles["sku-popover--header"]}>Status info:</div>
+          <div className={styles["sku-popover--content-row"]}>
+            <span className={styles["sku-popover--content-row--text"]}><span>A clickable link appears here when the product is in stock which opens a new tab with the purchase URL</span></span>
+          </div>
         </div>
       );
     }

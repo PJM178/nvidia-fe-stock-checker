@@ -86,6 +86,8 @@
   border-radius: 5px;
   border: solid var(--error-stroke-strong) 2px;
   background-color: var(--error-text);
+  min-width: 25px;
+  min-height: 25px;
   width: 25px;
   height: 25px;
 }
@@ -94,6 +96,8 @@
   border-radius: 5px;
   border: solid var(--warning-stroke-strong) 2px;
   background-color: var(--warning-text);
+  min-width: 25px;
+  min-height: 25px;
   width: 25px;
   height: 25px;
 }
@@ -102,6 +106,8 @@
   border-radius: 5px;
   border: solid var(--success-stroke-strong) 2px;
   background-color: var(--success-text);
+  min-width: 25px;
+  min-height: 25px;
   width: 25px;
   height: 25px;
 }
@@ -162,4 +168,30 @@ button.primary-button {
 
 .sku-grid-table--item-gpuname-api {
   position: absolute;
+}
+
+.sku-popover--container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.sku-popover--header {
+  font-size: larger;
+  font-weight: bolder;
+}
+
+.sku-popover--content-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.sku-popover--content-row--text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  hyphens: auto;
 }
