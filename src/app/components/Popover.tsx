@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import styles from "./Popover.module.css";
 import { useEffect, useRef } from "react";
+import { checkIfScrollbar } from "../utils/utilities";
 
 interface PopoverProps {
   anchorEl: HTMLElement | null;
@@ -14,6 +15,8 @@ const Popover = (props: PopoverProps) => {
 
   const handleOnClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
+    document.documentElement.style.overflow = "unset";
+    document.body.style.paddingRight = "unset";
     onClose();
   }
 
@@ -22,6 +25,12 @@ const Popover = (props: PopoverProps) => {
       const anchorRect = anchorEl.getBoundingClientRect();
 
       if (contentRef.current) {
+        document.documentElement.style.overflow = "hidden";
+
+        if (checkIfScrollbar()) {
+          document.body.style.paddingRight = "17px";
+        }
+
         const contentRect = contentRef.current.getBoundingClientRect();
 
         contentRef.current.style.top = (anchorRect.top + anchorRect.height) + 5 + "px";

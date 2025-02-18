@@ -8,3 +8,13 @@ export function makeAbsoluteUrl(url: string) {
 
   return url;
 };
+
+// Returns true if scroll height is larger than the client height, indicating that there
+// is a scrollbar
+export function checkIfScrollbar() {
+  if (document.documentElement.scrollHeight > document.documentElement.clientHeight) {
+    return true;
+  }
+
+  return false;
+}
