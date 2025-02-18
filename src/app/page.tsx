@@ -8,7 +8,7 @@ import { useCountdown } from "./hooks/useCountdown";
 import { makeAbsoluteUrl } from "./utils/utilities";
 import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
-  GridTableProps, ApiSkuData
+  GridTableProps, ApiSkuData, SKUExtraApiElementProps
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 
@@ -354,8 +354,34 @@ const LocaleBar = (props: LocaleBarProps) => {
   );
 }
 
+const SKUExtraApiElement = (props: SKUExtraApiElementProps) => {
+  const { isUpdated, isFromApi } = props;
+
+  if (isUpdated) {
+    return (
+      <span className={styles["sku-extra-api-element--container"]}>
+        <span>
+          Updated
+        </span>
+      </span>
+    );
+  }
+
+  if (isFromApi) {
+    return (
+      <span>
+        <span>
+          API
+        </span>
+      </span>
+    );
+  }
+
+  return null;
+};
+
 const SKU = (props: SKUProps) => {
-  const { gpuName, skuName, locale, isActive } = props;
+  const { gpuName, skuName, locale, isActive, isUpdated, isFromApi } = props;
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(mockResponseDataSuccess);
 
@@ -433,16 +459,10 @@ const SKU = (props: SKUProps) => {
     return null;
   }
 
-  const handleAPIElement = (skuName?: string, apiSkuName?: string) => {
-    if (skuName === apiSkuName) return null;
-
-    return <span className={styles["sku-grid-table--item-gpuname-api"]}>API</span>;
-  };
-
   return (
     <div className={styles["sku-grid-table--row"]}>
       <div className={styles["sku-grid-table--item"]}>
-        <span className={styles["sku-grid-table--item-gpuname-container"]}>{gpuName}{handleAPIElement()}</span>
+        <span className={styles["sku-grid-table--item-gpuname-container"]}>{gpuName}<SKUExtraApiElement isUpdated={isUpdated} isFromApi={isFromApi} /></span>
       </div>
       <div className={styles["sku-grid-table--item"]}>{apiStatusElement()}</div>
       <div className={styles["sku-grid-table--item"]}>{inStockElement()}</div>
@@ -482,6 +502,7 @@ const GridTable = (props: GridTableProps) => {
         apiSkuDataList.forEach((sku) => {
           const toInsertSku: SkuData = {
             isUpdated: true,
+            isFromApi: false,
             gpuName: (sku as { gpu: string }).gpu,
             skuName: (sku as { productSKU: string }).productSKU,
           };
@@ -599,6 +620,8 @@ const GridTable = (props: GridTableProps) => {
           isActive={isActive}
           skuName={sku.skuName}
           gpuName={sku.gpuName}
+          isFromApi={sku.isFromApi}
+          isUpdated={sku.isUpdated}
           locale={skuData.country[country].locale}
         />
       ))}

@@ -5,6 +5,8 @@ export interface SKUProps {
   skuName: string;
   locale: string;
   isActive: boolean;
+  isUpdated: boolean;
+  isFromApi: boolean;
 }
 
 export interface ResponseSkuData {
@@ -32,6 +34,7 @@ export interface SkuData {
   gpuName: string;
   skuName: string;
   isUpdated: boolean;
+  isFromApi: boolean;
 }
 
 export interface TimerProps {
@@ -54,4 +57,9 @@ export interface GridTableProps {
 export interface ApiSkuData {
   isLoading: boolean;
   data: unknown[];
+}
+
+export interface SKUExtraApiElementProps {
+  isUpdated: boolean;
+  isFromApi: boolean;
 }
