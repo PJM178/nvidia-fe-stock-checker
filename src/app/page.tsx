@@ -299,7 +299,7 @@ const Timer = (props: TimerProps) => {
     setShouldRefresh((prevValue) => !prevValue);
   }, [setShouldRefresh]);
 
-  const { timeLeft } = useCountdown({ startTime: 5, repeat: true, callback: handleUseCountdownCallback });
+  const { timeLeft } = useCountdown({ startTime: 5, repeat: false, callback: handleUseCountdownCallback });
 
   return timeLeft < 10 ? "0" + timeLeft : timeLeft;
 };
