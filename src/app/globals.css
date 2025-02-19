@@ -151,6 +151,10 @@ button:focus-visible {
   outline-width: 2px;
 }
 
+svg:focus-visible {
+  fill: var(--brand);
+}
+
 main {
   display: flex;
   justify-content: center;

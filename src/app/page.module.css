@@ -42,11 +42,6 @@
   display: contents;
 }
 
-.sku-grid-table--row:hover .sku-grid-table--item {
-  background-color: blue;
-  opacity: 0.3;
-}
-
 .sku-grid-table--header {
   display: flex;
   justify-content: center;
@@ -64,6 +59,10 @@
   outline-color: var(--brand);
   outline-offset: 2px;
   outline-width: 2px;
+}
+
+.sku-grid-table--header-icon:focus-visible svg {
+  fill: var(--brand);
 }
 
 .sku-grid-table--header-icon-icon:hover {

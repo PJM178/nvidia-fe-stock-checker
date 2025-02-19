@@ -98,3 +98,69 @@
 .primary-button--icon.start {
   margin-right: 0.25rem;
 }
+
+.switch--container {
+  display: inline-flex;
+  width: 58px;
+  height: 38px;
+  padding: 12px;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.switch--container:hover {
+  cursor: pointer;
+}
+
+.switch--container:hover .switch--tack-border {
+  display: block;
+}
+
+.switch--background {
+  border-radius: 7px;
+  width: 100%;
+  height: 100%;
+  background-color: var(--stroke-weak);
+}
+
+.switch--background.active {
+  background-color: var(--text-weak);
+}
+
+.switch--tack-container {
+  position: absolute;
+  transition: transform linear 100ms;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+}
+
+.switch--tack-container.active {
+  transform: translateX(14px);  
+}
+
+.switch--tack {
+  border-radius: 50%;
+  background-color: var(--stroke-strong);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.switch--tack.active {
+  background-color: var(--text-strong);
+}
+
+.switch--tack-border {
+  border-radius: 50%;
+  background-color: rgba(211, 211, 211, 0.4);
+  padding: 8px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: none;
+}

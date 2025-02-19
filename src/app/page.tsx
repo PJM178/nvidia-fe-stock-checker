@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./page.module.css";
-import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/Icons";
-import { Button } from "./components/Buttons";
+import { Notification, PlayArrow, QuestionMark, StopCircle, ToggleOn } from "./components/Icons";
+import { Button, Switch } from "./components/Buttons";
 import { useCountdown } from "./hooks/useCountdown";
 import { makeAbsoluteUrl } from "./utils/utilities";
 import {
@@ -393,7 +393,7 @@ const SKUExtraApiElement = (props: SKUExtraApiElementProps) => {
 
   if (isFromApi) {
     return (
-      <span>
+      <span className={styles["sku-extra-api-element--container"]}>
         <span>
           API
         </span>
@@ -658,8 +658,7 @@ const GridTable = (props: GridTableProps) => {
 // Check store api page for real sku names
 // if they differ from the list, update the sku names
 // offer user ability to manually override the sku name if empty list is returned
-// TODO: add to popover component the ability to offest the position of popover if it's overflowing
-// either horizontally or vertically
+// TODO: Add switch component for future settings menu
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);
@@ -731,6 +730,11 @@ export default function Home() {
           <GridTable apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <button onClick={handleThemeLight}>light theme</button>
           <button onClick={handleThemeDark}>dark theme</button>
+          <div>
+          <ToggleOn />
+          </div>
+          <Switch />
+          
         </div>
       </main>
     </>
