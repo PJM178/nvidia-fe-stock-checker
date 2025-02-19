@@ -658,6 +658,8 @@ const GridTable = (props: GridTableProps) => {
 // Check store api page for real sku names
 // if they differ from the list, update the sku names
 // offer user ability to manually override the sku name if empty list is returned
+// TODO: add to popover component the ability to offest the position of popover if it's overflowing
+// either horizontally or vertically
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);

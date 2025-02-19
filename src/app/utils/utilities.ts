@@ -18,3 +18,8 @@ export function checkIfScrollbar() {
 
   return false;
 }
+
+// Checks if the device used to visit the app is mobile
+export function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+}

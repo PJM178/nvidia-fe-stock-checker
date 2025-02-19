@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import styles from "./Popover.module.css";
 import { useEffect, useRef } from "react";
-import { checkIfScrollbar } from "../utils/utilities";
+import { checkIfScrollbar, isMobileDevice } from "../utils/utilities";
 
 interface PopoverProps {
   anchorEl: HTMLElement | null;
@@ -27,7 +27,7 @@ const Popover = (props: PopoverProps) => {
       if (contentRef.current) {
         document.documentElement.style.overflow = "hidden";
 
-        if (checkIfScrollbar()) {
+        if (checkIfScrollbar() && !isMobileDevice()) {
           document.body.style.paddingRight = "17px";
         }
 
