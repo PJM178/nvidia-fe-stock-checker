@@ -7,6 +7,7 @@
   --text-weak: #6E7656;
   /* Contrast to fill at least 3:1 */
   --stroke-strong: #829669;
+  --stroke-weak-variant: hsla(82, 28.14%, 81.65%, 1);
   --stroke-weak: hsla(82, 28.14%, 91.65%, 1);
   --fill: #f8faf5;
   --background: #ffffff;
@@ -34,6 +35,7 @@
     --text-weak: #d5d9ce;
     /* Contrast to fill at least 3:1 */
     --stroke-strong: #a0a695;
+    --stroke-weak-variant: hsl(82, 8.1%, 33.1%);
     --stroke-weak: hsl(82, 8.1%, 23.1%);
     --fill: hsl(82, 11.1%, 13.5%);
     --background: #171912;
@@ -61,6 +63,7 @@ body.light-mode {
   --text-weak: #6E7656;
   /* Contrast to fill at least 3:1 */
   --stroke-strong: #829669;
+  --stroke-weak-variant: hsla(82, 28.14%, 81.65%, 1);
   --stroke-weak: hsla(82, 28.14%, 91.65%, 1);
   --fill: #f8faf5;
   --background: #ffffff;
@@ -88,6 +91,7 @@ body.dark-mode {
   --text-weak: #d5d9ce;
   /* Contrast to fill at least 3:1 */
   --stroke-strong: #a0a695;
+  --stroke-weak-variant: hsl(82, 8.1%, 33.1%);
   --stroke-weak: hsl(82, 8.1%, 23.1%);
   --fill: hsl(82, 11.1%, 13.5%);
   --background: #171912;

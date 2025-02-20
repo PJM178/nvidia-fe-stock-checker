@@ -5,15 +5,15 @@ interface InlinePointerEnterAndLeaveWrapperProps {
   children: React.ReactNode;
   className?: string;
   popoverContent?: React.ReactNode;
+  ariaLabel?: string;
 }
 
 export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLeaveWrapperProps) => {
-  const { children, className, popoverContent } = props;
+  const { children, className, popoverContent, ariaLabel } = props;
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const elementRef = useRef<HTMLElement>(null);
 
   const handleClick = () => {
-    console.log("whayt")
     setAnchorEl(elementRef.current);
   }
 
@@ -40,8 +40,8 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
       onClick={handleClick}
       tabIndex={0}
       role="button"
-      aria-label="Opens more info popup"
-      aria-haspopup={true}
+      aria-label={ariaLabel}
+      aria-haspopup={popoverContent ? true : false}
       onKeyDown={handleKeyDown}
     >
       {children}

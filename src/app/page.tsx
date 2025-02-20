@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./page.module.css";
-import { Notification, PlayArrow, QuestionMark, StopCircle } from "./components/Icons";
+import { Notification, PlayArrow, QuestionMark, Settings, StopCircle } from "./components/Icons";
 import { Button, Switch } from "./components/Buttons";
 import { useCountdown } from "./hooks/useCountdown";
 import { makeAbsoluteUrl } from "./utils/utilities";
@@ -613,6 +613,7 @@ const GridTable = (props: GridTableProps) => {
         <InlinePointerEnterAndLeaveWrapper
           className={styles["sku-grid-table--header-icon"]}
           popoverContent={handlePopoverContent("api")}
+          ariaLabel="Opens more info popup"
         >
           <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
         </InlinePointerEnterAndLeaveWrapper>
@@ -621,6 +622,7 @@ const GridTable = (props: GridTableProps) => {
         In Stock
         <InlinePointerEnterAndLeaveWrapper
           className={styles["sku-grid-table--header-icon"]}
+          ariaLabel="Opens more info popup"
           popoverContent={handlePopoverContent("stock")}
         >
           <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
@@ -633,6 +635,7 @@ const GridTable = (props: GridTableProps) => {
         <InlinePointerEnterAndLeaveWrapper
           className={styles["sku-grid-table--header-icon"]}
           popoverContent={handlePopoverContent("link")}
+          ariaLabel="Opens more info popup"
         >
           <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
         </InlinePointerEnterAndLeaveWrapper>
@@ -653,12 +656,44 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
+const Footer = () => {
+  const handlePopoverContent = () => {
+    return (
+      <div className={styles["footer-container--settings-menu"]}>
+        <div className={styles["footer-container--settings-menu--row"]}>
+          <span>Some setting</span>
+          <span className={styles["footer-container--settings-menu--row-switch"]}>
+            <Switch isActive={false} />
+          </span>
+        </div>
+        <div className={styles["footer-container--settings-menu--row"]}>
+          <span>Some other setting</span>
+          <span className={styles["footer-container--settings-menu--row-switch"]}>
+            <Switch isActive={true} />
+          </span>
+        </div>
+      </div>
+    );
+  }
 
+  return (
+    <footer className={styles["footer-container"]}>
+      <InlinePointerEnterAndLeaveWrapper
+        className={styles["footer-container--settings"]}
+        popoverContent={handlePopoverContent()}
+        ariaLabel="Opens settings menu"
+      >
+        <Settings className={styles["footer-container--settings-icon"]} />
+      </InlinePointerEnterAndLeaveWrapper>
+    </footer>
+  );
+};
 
 // Check store api page for real sku names
 // if they differ from the list, update the sku names
 // offer user ability to manually override the sku name if empty list is returned
-// TODO: Add Footer
+// TODO: Make transparent color palette for better overlay element handling
+// TODO: Add anchor origin to popover menu - center, left, right
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [isAlertActive, setIsAlertActive] = useState(false);
@@ -732,8 +767,7 @@ export default function Home() {
           <button onClick={handleThemeDark}>dark theme</button>
           <div>
           </div>
-          <Switch />
-          
+          <Footer />
         </div>
       </main>
     </>
