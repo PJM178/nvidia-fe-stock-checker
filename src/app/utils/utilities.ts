@@ -23,3 +23,8 @@ export function checkIfScrollbar() {
 export function isMobileDevice() {
   return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
 }
+
+// Capitalizes the first letter of the parameter string
+export function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -5,11 +5,12 @@ import styles from "./page.module.css";
 import { Notification, PlayArrow, QuestionMark, Settings, StopCircle } from "./components/Icons";
 import { Button, Switch } from "./components/Buttons";
 import { useCountdown } from "./hooks/useCountdown";
-import { makeAbsoluteUrl } from "./utils/utilities";
+import { capitalizeFirstLetter, makeAbsoluteUrl } from "./utils/utilities";
 import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
   GridTableProps, ApiSkuData, SKUExtraApiElementProps,
-  FooterProps
+  FooterProps,
+  UserSettings
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 
@@ -659,26 +660,42 @@ const GridTable = (props: GridTableProps) => {
 
 const Footer = (props: FooterProps) => {
   const { setUserSettings, userSettings } = props;
+  const themeOptions: UserSettings["theme"][] = ["system", "dark", "light"];
+
+  const handleThemeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUserSettings((prevValue) => {
+      return { ...prevValue, theme: e.target.value as UserSettings["theme"]}
+    })
+  }
 
   const handleSelectNotification = () => {
     setUserSettings((prevValue) => {
       return { ...prevValue, notification: !prevValue.notification };
     });
   };
-  console.log(userSettings);
+
+
   const handlePopoverContent = () => {
     return (
       <div className={styles["footer-container--settings-menu"]}>
         <div className={styles["footer-container--settings-menu--row"]}>
           <span>Send desktop notification</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch isActive={userSettings.notification} onClick={() => handleSelectNotification()} />
+            <Switch isActive={userSettings.notification} onClick={handleSelectNotification} />
           </span>
         </div>
         <div className={styles["footer-container--settings-menu--row"]}>
           <span>Select theme</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch isActive={true} />
+            <select
+              defaultValue={userSettings.theme}
+              onChange={handleThemeSelect}
+              className={styles["footer-container--settings-menu--row-select"]}
+            >
+              {themeOptions.map((theme) => (
+                <option key={theme} value={theme}>{capitalizeFirstLetter(theme)}</option>
+              ))}
+            </select>
           </span>
         </div>
       </div>
@@ -706,7 +723,7 @@ const Footer = (props: FooterProps) => {
 // TODO: Add anchor origin to popover menu - center, left, right
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
-  const [userSettings, setUserSettings] = useState<{ theme: "system" | "dark" | "light", notification: boolean }>({ theme: "system", notification: false });
+  const [userSettings, setUserSettings] = useState<UserSettings>({ theme: "system", notification: false });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });

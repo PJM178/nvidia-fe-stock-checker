@@ -271,3 +271,7 @@ button.primary-button {
 .footer-container--settings-menu-popover {
   max-width: unset !important;
 }
+
+.footer-container--settings-menu--row-select {
+  padding: 5px;
+}
