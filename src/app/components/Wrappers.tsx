@@ -6,10 +6,11 @@ interface InlinePointerEnterAndLeaveWrapperProps {
   className?: string;
   popoverContent?: React.ReactNode;
   ariaLabel?: string;
+  popoverClassName?: string;
 }
 
 export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLeaveWrapperProps) => {
-  const { children, className, popoverContent, ariaLabel } = props;
+  const { children, className, popoverContent, ariaLabel, popoverClassName } = props;
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const elementRef = useRef<HTMLElement>(null);
 
@@ -45,7 +46,7 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
       onKeyDown={handleKeyDown}
     >
       {children}
-      {popoverContent && anchorEl && <Popover anchorEl={anchorEl} onClose={onClose}>
+      {popoverContent && anchorEl && <Popover popoverClassName={popoverClassName} anchorEl={anchorEl} onClose={onClose}>
         {popoverContent}
       </Popover>}
     </span>

@@ -7,11 +7,17 @@ interface PopoverProps {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   children: React.ReactNode;
+  popoverClassName?: string;
 }
 
 const Popover = (props: PopoverProps) => {
-  const { anchorEl, onClose, children } = props;
+  const { anchorEl, onClose, children, popoverClassName } = props;
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const popoverStyles = {
+    props: popoverClassName ? popoverClassName : null,
+    base: styles["popover-container--popover"],
+  };
 
   const handleOnClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
@@ -59,7 +65,7 @@ const Popover = (props: PopoverProps) => {
               className={styles["popover-container--close-popover"]}
               onClick={handleOnClick}
             />
-            <div ref={contentRef} className={styles["popover-container--popover"]}>
+            <div ref={contentRef} className={Object.values(popoverStyles).join(" ").trim()}>
               {children}
             </div>
           </div>,

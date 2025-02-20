@@ -267,3 +267,7 @@ button.primary-button {
 .footer-container--settings-menu--row-switch {
   margin-left: auto;
 }
+
+.footer-container--settings-menu-popover {
+  max-width: unset !important;
+}

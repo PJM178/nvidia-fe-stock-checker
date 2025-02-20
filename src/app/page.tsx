@@ -8,7 +8,8 @@ import { useCountdown } from "./hooks/useCountdown";
 import { makeAbsoluteUrl } from "./utils/utilities";
 import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
-  GridTableProps, ApiSkuData, SKUExtraApiElementProps
+  GridTableProps, ApiSkuData, SKUExtraApiElementProps,
+  FooterProps
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 
@@ -656,18 +657,26 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
-const Footer = () => {
+const Footer = (props: FooterProps) => {
+  const { setUserSettings, userSettings } = props;
+
+  const handleSelectNotification = () => {
+    setUserSettings((prevValue) => {
+      return { ...prevValue, notification: !prevValue.notification };
+    });
+  };
+  console.log(userSettings);
   const handlePopoverContent = () => {
     return (
       <div className={styles["footer-container--settings-menu"]}>
         <div className={styles["footer-container--settings-menu--row"]}>
-          <span>Some setting</span>
+          <span>Send desktop notification</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch isActive={false} />
+            <Switch isActive={userSettings.notification} onClick={() => handleSelectNotification()} />
           </span>
         </div>
         <div className={styles["footer-container--settings-menu--row"]}>
-          <span>Some other setting</span>
+          <span>Select theme</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
             <Switch isActive={true} />
           </span>
@@ -682,6 +691,7 @@ const Footer = () => {
         className={styles["footer-container--settings"]}
         popoverContent={handlePopoverContent()}
         ariaLabel="Opens settings menu"
+        popoverClassName={styles["footer-container--settings-menu-popover"]}
       >
         <Settings className={styles["footer-container--settings-icon"]} />
       </InlinePointerEnterAndLeaveWrapper>
@@ -696,6 +706,7 @@ const Footer = () => {
 // TODO: Add anchor origin to popover menu - center, left, right
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
+  const [userSettings, setUserSettings] = useState<{ theme: "system" | "dark" | "light", notification: boolean }>({ theme: "system", notification: false });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });
@@ -767,7 +778,7 @@ export default function Home() {
           <button onClick={handleThemeDark}>dark theme</button>
           <div>
           </div>
-          <Footer />
+          <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
         </div>
       </main>
     </>

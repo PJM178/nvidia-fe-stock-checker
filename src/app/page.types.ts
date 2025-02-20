@@ -63,3 +63,14 @@ export interface SKUExtraApiElementProps {
   isUpdated: boolean;
   isFromApi: boolean;
 }
+
+export interface FooterProps {
+  userSettings: {
+    theme: "system" | "dark" | "light";
+    notification: boolean;
+  };
+  setUserSettings: React.Dispatch<React.SetStateAction<{
+    theme: "system" | "dark" | "light";
+    notification: boolean;
+  }>>;
+}
