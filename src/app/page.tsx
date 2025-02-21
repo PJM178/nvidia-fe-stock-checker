@@ -342,7 +342,12 @@ const LocaleBar = (props: LocaleBarProps) => {
 
   return (
     <div className={styles["locale-bar-container"]}>
-      <select className={styles["locale-bar--select-menu"]} defaultValue={"Suomi"} onChange={handleCountrySelect}>
+      <select
+        className={styles["locale-bar--select-menu"]}
+        defaultValue={"Suomi"}
+        onChange={handleCountrySelect}
+        aria-label="Select store country"
+      >
         {sortedCountries.map(country => (
           <option key={country.endonym}>{country.endonym}</option>
         ))}
@@ -689,18 +694,6 @@ const Footer = (props: FooterProps) => {
           </span>
         </div>
         <div className={styles["footer-container--settings-menu--row"]}>
-          <span id="settings-notification-label">Send desktop notification</span>
-          <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch ariaLabelledBy="settings-notification-label" isActive={userSettings.notification} onClick={handleSelectNotification} />
-          </span>
-        </div>
-        <div className={styles["footer-container--settings-menu--row"]}>
-          <span id="settings-notification-label">Send desktop notification</span>
-          <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch ariaLabelledBy="settings-notification-label" isActive={userSettings.notification} onClick={handleSelectNotification} />
-          </span>
-        </div>
-        <div className={styles["footer-container--settings-menu--row"]}>
           <span id="settings-theme-label">Select theme</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
             <select
@@ -738,8 +731,6 @@ const Footer = (props: FooterProps) => {
 // offer user ability to manually override the sku name if empty list is returned
 // TODO: Make transparent color palette for better overlay element handling
 // TODO: Add anchor origin to popover menu - center, left, right
-// TODO: adjust popover menu also if it overflows from right
-// TODO: Make wrapper component keyboard accessibility better by at least giving focus to the popover menu
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [userSettings, setUserSettings] = useState<UserSettings>({ theme: "system", notification: false });

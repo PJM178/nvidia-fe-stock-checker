@@ -39,9 +39,12 @@ const Popover = (props: PopoverProps) => {
         }
 
         const contentRect = contentRef.current.getBoundingClientRect();
-        const top =  (anchorRect.top + anchorRect.height) + 5;
+        const top = (anchorRect.top + anchorRect.height) + 5;
         const left = anchorRect.left - contentRect.width / 2 + anchorRect.width / 2;
-
+        console.log(top)
+        console.log(left)
+        console.log(contentRect);
+        console.log(window.innerWidth);
         if (top + contentRect.height > window.innerHeight) {
           contentRef.current.style.top = top - (top + contentRect.height - window.innerHeight) - 2 + "px";
         } else {
@@ -50,10 +53,11 @@ const Popover = (props: PopoverProps) => {
 
         if (left <= 0) {
           contentRef.current.style.left = 2 + "px";
+        } else if ((left + contentRect.width) > window.innerWidth) {
+          contentRef.current.style.left = left - ((left + contentRect.width) - window.innerWidth) - 2 + "px";
         } else {
           contentRef.current.style.left = left + "px";
         }
-        contentRef.current.focus();
       }
 
     }
