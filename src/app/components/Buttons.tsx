@@ -38,10 +38,11 @@ export const Button = (props: ButtonProps) => {
 interface SwitchProps {
   isActive: boolean;
   onClick: () => void;
+  ariaLabelledBy?: string;
 }
 
 export const Switch = (props: SwitchProps) => {
-  const { isActive, onClick } = props;
+  const { isActive, onClick, ariaLabelledBy } = props;
 
   function handleStyles(element: "background" | "tack" | "tack-container") {
     if (element === "background") {
@@ -70,12 +71,23 @@ export const Switch = (props: SwitchProps) => {
 
       return Object.values(switchStyles).join(" ").trim();
     }
-  }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.code === "Enter" || e.code === "Space") {
+      onClick();
+    }
+  };
 
   return (
     <span
       className={styles["switch--container"]}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role="switch"
+      aria-checked={isActive}
+      tabIndex={0}
+      aria-labelledby={ariaLabelledBy}
     >
       <span  className={handleStyles("tack-container")}>
         <span className={handleStyles("tack")} />
@@ -83,5 +95,5 @@ export const Switch = (props: SwitchProps) => {
       </span>
       <span className={handleStyles("background")} />
     </span>
-  )
-}
+  );
+};

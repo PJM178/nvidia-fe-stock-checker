@@ -31,6 +31,7 @@ const Popover = (props: PopoverProps) => {
       const anchorRect = anchorEl.getBoundingClientRect();
 
       if (contentRef.current) {
+
         document.documentElement.style.overflow = "hidden";
 
         if (checkIfScrollbar() && !isMobileDevice()) {
@@ -52,8 +53,51 @@ const Popover = (props: PopoverProps) => {
         } else {
           contentRef.current.style.left = left + "px";
         }
+        contentRef.current.focus();
       }
+
     }
+  }, [anchorEl]);
+
+  useEffect(() => {
+    if (!anchorEl || !contentRef.current) return;
+
+    const focusableElements = contentRef.current.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    ) as NodeListOf<HTMLElement>;
+
+    if (focusableElements.length) {
+      focusableElements[0].focus();
+    }
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey) return;
+
+      if (contentRef.current) {
+        if (!contentRef.current.contains(e.target as Node)) {
+          e.preventDefault();
+          
+          return;
+        }
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.code === "Tab") {
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+
+    return () => document.removeEventListener("keydown", handleTab);
   }, [anchorEl]);
 
   if (anchorEl) {

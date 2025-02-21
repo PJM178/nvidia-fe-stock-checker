@@ -23,14 +23,24 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.ctrlKey && e.shiftKey) return;
+    
+    if (anchorEl) {
+      if (e.code === "Escape") {
+        anchorEl.focus();
+
+        setAnchorEl(null);
+      }
+
+      return;
+    };
+
     if (e.code === "Enter" || e.code === "Space") {
       if (anchorEl) {
         return setAnchorEl(null);
       }
 
       handleClick();
-    } else {
-      setAnchorEl(null);
     }
   }
 
