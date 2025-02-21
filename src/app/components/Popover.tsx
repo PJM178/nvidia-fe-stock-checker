@@ -8,10 +8,11 @@ interface PopoverProps {
   onClose: () => void;
   children: React.ReactNode;
   popoverClassName?: string;
+  anchorOrigin?: "left" | "center" | "right";
 }
 
 const Popover = (props: PopoverProps) => {
-  const { anchorEl, onClose, children, popoverClassName } = props;
+  const { anchorEl, onClose, children, popoverClassName, anchorOrigin = "center" } = props;
   const contentRef = useRef<HTMLDivElement>(null);
 
   const popoverStyles = {
@@ -40,11 +41,17 @@ const Popover = (props: PopoverProps) => {
 
         const contentRect = contentRef.current.getBoundingClientRect();
         const top = (anchorRect.top + anchorRect.height) + 5;
-        const left = anchorRect.left - contentRect.width / 2 + anchorRect.width / 2;
-        console.log(top)
-        console.log(left)
-        console.log(contentRect);
-        console.log(window.innerWidth);
+        // Default origin is center
+        let left = anchorRect.left - contentRect.width / 2 + anchorRect.width / 2;
+ 
+        if (anchorOrigin === "left") {
+          left = anchorRect.left;
+        }
+
+        if (anchorOrigin === "right") {
+          left = anchorRect.left - contentRect.width + anchorRect.width;
+        }
+
         if (top + contentRect.height > window.innerHeight) {
           contentRef.current.style.top = top - (top + contentRect.height - window.innerHeight) - 2 + "px";
         } else {
@@ -61,7 +68,7 @@ const Popover = (props: PopoverProps) => {
       }
 
     }
-  }, [anchorEl]);
+  }, [anchorEl, anchorOrigin]);
 
   useEffect(() => {
     if (!anchorEl || !contentRef.current) return;
