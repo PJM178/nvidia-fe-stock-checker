@@ -16,4 +16,7 @@
   border-radius: 5px;
   padding: 10px;
   max-width: 200px;
+  border-color: var(--stroke-weak-variant);
+  border-width: 2px;
+  border-style: solid;
 }

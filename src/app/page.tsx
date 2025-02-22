@@ -672,10 +672,27 @@ const Footer = (props: FooterProps) => {
   const themeOptions: UserSettings["theme"][] = ["system", "dark", "light"];
 
   const handleThemeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as UserSettings["theme"];
+
+    if (value === "dark") {
+      localStorage.setItem("theme", "dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
+    if (value === "light") {
+      localStorage.setItem("theme", "light");
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    if (value === "system") {
+      localStorage.removeItem("theme");
+      document.documentElement.removeAttribute("data-theme");
+    }
+
     setUserSettings((prevValue) => {
-      return { ...prevValue, theme: e.target.value as UserSettings["theme"] }
-    })
-  }
+      return { ...prevValue, theme: value }
+    });
+  };
 
   const handleSelectNotification = () => {
     setUserSettings((prevValue) => {
@@ -710,7 +727,7 @@ const Footer = (props: FooterProps) => {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <footer className={styles["footer-container"]}>
@@ -730,35 +747,15 @@ const Footer = (props: FooterProps) => {
 // if they differ from the list, update the sku names
 // offer user ability to manually override the sku name if empty list is returned
 // TODO: Make transparent color palette for better overlay element handling
-// TODO: Add anchor origin to popover menu - center, left, right
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
-  const [userSettings, setUserSettings] = useState<UserSettings>({ theme: "system", notification: false });
+  const [userSettings, setUserSettings] = useState<UserSettings>({
+    theme: typeof window !== "undefined" && localStorage.getItem("theme") as UserSettings["theme"] || "system", notification: false
+  });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });
   console.log(Object.values(skuData.country[chosenCountry].skus));
-  const handleThemeDark = () => {
-    document.body.classList.toggle("dark-mode");
-    localStorage.setItem("theme", "dark");
-  }
-
-  const handleThemeLight = () => {
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("theme", "light");
-  }
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      document.body.classList.add("dark-mode");
-    }
-
-    if (savedTheme === "light") {
-      document.body.classList.add("light-mode");
-    }
-  }, []);
 
   useEffect(() => {
     async function checkStock() {
@@ -801,10 +798,6 @@ export default function Home() {
             setShouldRefresh={setShouldRefresh}
           />
           <GridTable apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
-          <button onClick={handleThemeLight}>light theme</button>
-          <button onClick={handleThemeDark}>dark theme</button>
-          <div>
-          </div>
           <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
         </div>
       </main>

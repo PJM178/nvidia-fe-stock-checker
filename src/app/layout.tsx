@@ -23,7 +23,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script id="theme">
+          {`
+            if (typeof window !== undefined) {
+              const theme = localStorage.getItem("theme");
+
+              if (theme) {
+                document.documentElement.setAttribute("data-theme", theme);
+              }
+            }
+          `}
+        </script>
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>
