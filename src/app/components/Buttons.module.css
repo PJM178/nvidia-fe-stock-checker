@@ -108,12 +108,24 @@
   align-items: center;
 }
 
+.switch--container.disabled {
+  opacity: 0.4;
+}
+
 .switch--container:hover {
   cursor: pointer;
 }
 
+.switch--container.disabled:hover {
+  cursor: not-allowed;
+}
+
 .switch--container:hover .switch--tack-border {
   display: block;
+}
+
+.switch--container:hover .switch--tack-border.disabled {
+  display: none;
 }
 
 .switch--background {

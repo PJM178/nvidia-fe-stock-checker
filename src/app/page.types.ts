@@ -66,7 +66,7 @@ export interface SKUExtraApiElementProps {
 
 export type UserSettings = {
   theme: "system" | "dark" | "light";
-  notification: boolean;
+  notification: typeof window.Notification.permission;
 };
 
 export interface FooterProps {

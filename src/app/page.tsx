@@ -695,11 +695,23 @@ const Footer = (props: FooterProps) => {
   };
 
   const handleSelectNotification = () => {
-    setUserSettings((prevValue) => {
-      return { ...prevValue, notification: !prevValue.notification };
-    });
-  };
+    if (window.Notification.permission !== "denied") {
+      window.Notification.requestPermission()
+        .then((permission) => {
+          if (permission === "granted") {
+            setUserSettings((prevValue) => {
+              return { ...prevValue, notification: "granted" };
+            });
+          }
 
+          if (permission === "denied") {
+            setUserSettings((prevValue) => {
+              return { ...prevValue, notification: "denied" };
+            });
+          }
+        });
+    }
+  };
 
   const handlePopoverContent = () => {
     return (
@@ -707,7 +719,13 @@ const Footer = (props: FooterProps) => {
         <div className={styles["footer-container--settings-menu--row"]}>
           <span id="settings-notification-label">Send desktop notification</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
-            <Switch ariaLabelledBy="settings-notification-label" isActive={userSettings.notification} onClick={handleSelectNotification} />
+            <Switch
+              disabled={userSettings.notification === "denied" || userSettings.notification === "granted"}
+              ariaLabelledBy="settings-notification-label"
+              isActive={userSettings.notification === "granted"}
+              onClick={handleSelectNotification}
+              title={userSettings.notification !== "default" ? "Notifications already set - left of address bar to unset" : undefined}
+            />
           </span>
         </div>
         <div className={styles["footer-container--settings-menu--row"]}>
@@ -750,12 +768,20 @@ const Footer = (props: FooterProps) => {
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [userSettings, setUserSettings] = useState<UserSettings>({
-    theme: typeof window !== "undefined" && localStorage.getItem("theme") as UserSettings["theme"] || "system", notification: false
+    theme: "system",
+    notification: "default",
   });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });
   console.log(Object.values(skuData.country[chosenCountry].skus));
+
+  useEffect(() => {
+    setUserSettings({
+      theme: localStorage.getItem("theme") as UserSettings["theme"] || "system",
+      notification: window.Notification.permission,
+    });
+  }, []);
 
   useEffect(() => {
     async function checkStock() {

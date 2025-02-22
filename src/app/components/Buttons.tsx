@@ -39,10 +39,12 @@ interface SwitchProps {
   isActive: boolean;
   onClick: () => void;
   ariaLabelledBy?: string;
+  disabled?: boolean;
+  title?: string;
 }
 
 export const Switch = (props: SwitchProps) => {
-  const { isActive, onClick, ariaLabelledBy } = props;
+  const { isActive, onClick, ariaLabelledBy, disabled, title } = props;
 
   function handleStyles(element: "background" | "tack" | "tack-container") {
     if (element === "background") {
@@ -81,17 +83,18 @@ export const Switch = (props: SwitchProps) => {
 
   return (
     <span
-      className={styles["switch--container"]}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
+      className={`${styles["switch--container"]}${disabled ? ` ${styles["disabled"]}`: ""}`}
+      onClick={!disabled ? onClick : undefined}
+      onKeyDown={!disabled ? handleKeyDown : undefined}
       role="switch"
       aria-checked={isActive}
       tabIndex={0}
       aria-labelledby={ariaLabelledBy}
+      title={title}
     >
       <span  className={handleStyles("tack-container")}>
         <span className={handleStyles("tack")} />
-        <span className={styles["switch--tack-border"]} />
+        <span className={`${styles["switch--tack-border"]}${disabled ? ` ${styles["disabled"]}`: ""}`} />
       </span>
       <span className={handleStyles("background")} />
     </span>
