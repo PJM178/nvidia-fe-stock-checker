@@ -493,7 +493,10 @@ const SKU = (props: SKUProps) => {
   return (
     <div className={styles["sku-grid-table--row"]}>
       <div className={styles["sku-grid-table--item"]}>
-        <span className={styles["sku-grid-table--item-gpuname-container"]}>{gpuName}<SKUExtraApiElement isUpdated={isUpdated} isFromApi={isFromApi} /></span>
+        <span className={styles["sku-grid-table--item-gpuname-container"]}>
+          <span>{gpuName}</span>
+          <SKUExtraApiElement isUpdated={isUpdated} isFromApi={isFromApi} />
+        </span>
       </div>
       <div className={styles["sku-grid-table--item"]}>{apiStatusElement()}</div>
       <div className={styles["sku-grid-table--item"]}>{inStockElement()}</div>
@@ -510,64 +513,98 @@ const SKU = (props: SKUProps) => {
 }
 
 const GridTable = (props: GridTableProps) => {
+  const [updatedSkuList, setUpdatedSkuList] = useState<SkuData[] | null>(null);
   const { isActive, country, apiSkuData } = props;
 
-  function checkIfIsInData() {
-    if (!apiSkuData.isLoading) {
-      const skuDataList = [...Object.values(skuData.country[country].skus)];
-      let apiSkuDataList = apiSkuData.data;
-      const updatedSkuList: SkuData[] = [];
+  useEffect(() => {
+    function checkIfIsInData() {
+      if (!apiSkuData.isLoading) {
+        const skuDataList = [...Object.values(skuData.country[country].skus)];
+        let apiSkuDataList = apiSkuData.data;
+        const updatedSkuList: SkuData[] = [];
 
-      skuDataList.forEach((sku) => {
-        const clonedSku = { ...sku };
-        const result = apiSkuDataList.find((gpu) =>
-          typeof gpu === "object" && gpu !== null && "gpu" in gpu && gpu.gpu === sku.gpuName
-        );
+        skuDataList.forEach((sku) => {
+          const clonedSku = { ...sku };
+          const result = apiSkuDataList.find((gpu) =>
+            typeof gpu === "object" && gpu !== null && "gpu" in gpu && gpu.gpu === sku.gpuName
+          );
 
-        if (sku.gpuName === (result as { gpu: string })?.gpu) {
-          clonedSku.isUpdated = (result as { productSKU: string })?.productSKU !== sku.skuName;
-          clonedSku.skuName = (result as { productSKU: string })?.productSKU;
-        }
+          if (sku.gpuName === (result as { gpu: string })?.gpu) {
+            clonedSku.isUpdated = (result as { productSKU: string })?.productSKU !== sku.skuName;
+            clonedSku.skuName = (result as { productSKU: string })?.productSKU;
+          }
 
-        updatedSkuList.push(clonedSku);
-        apiSkuDataList = apiSkuDataList.filter((apiSku) => (apiSku as { gpu: string }).gpu !== sku.gpuName);
-      });
-
-      if (apiSkuDataList.length > 0) {
-        apiSkuDataList.forEach((sku) => {
-          const toInsertSku: SkuData = {
-            isUpdated: true,
-            isFromApi: false,
-            gpuName: (sku as { gpu: string }).gpu,
-            skuName: (sku as { productSKU: string }).productSKU,
-          };
-
-          updatedSkuList.push(toInsertSku);
+          updatedSkuList.push(clonedSku);
+          apiSkuDataList = apiSkuDataList.filter((apiSku) => (apiSku as { gpu: string }).gpu !== sku.gpuName);
         });
+
+        if (apiSkuDataList.length > 0) {
+          apiSkuDataList.forEach((sku) => {
+            const toInsertSku: SkuData = {
+              isUpdated: true,
+              isFromApi: false,
+              gpuName: (sku as { gpu: string }).gpu,
+              skuName: (sku as { productSKU: string }).productSKU,
+            };
+
+            updatedSkuList.push(toInsertSku);
+          });
+        }
+
+        updatedSkuList.sort((a, b) => {
+          const gpuA = a.gpuName;
+          const gpuB = b.gpuName;
+
+          if (gpuA > gpuB) {
+            return -1;
+          }
+
+          if (gpuA < gpuB) {
+            return 1;
+          }
+
+          return 0;
+        })
+
+        console.log(updatedSkuList);
+        setUpdatedSkuList(updatedSkuList);
       }
+    };
 
-      updatedSkuList.sort((a, b) => {
-        const gpuA = a.gpuName;
-        const gpuB = b.gpuName;
+    checkIfIsInData();
+  }, [apiSkuData, country]);
 
-        if (gpuA > gpuB) {
-          return -1;
-        }
-
-        if (gpuA < gpuB) {
-          return 1;
-        }
-
-        return 0;
-      })
-
-      console.log(updatedSkuList);
+  const handlePopoverContent = (element: "api" | "stock" | "link" | "item") => {
+    if (element === "item") {
+      return (
+        <div className={styles["sku-popover--container"]}>
+          <div className={styles["sku-popover--header"]}>Item info:</div>
+          <div className={styles["sku-popover--content-grid-container"]}>
+            <div style={{ display: "contents" }} className={styles["sku-popover--content-row"]}>
+              <span className={styles["sku-extra-api-element--container-info-container"]}>
+                <span className={styles["sku-extra-api-element--container-info"]}>
+                  <span>
+                    Updated
+                  </span>
+                </span>
+              </span>
+              <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>SKU name was updated based on the response from the call to the Nvidia store listings</span></span>
+            </div>
+            <div style={{ display: "contents" }} className={styles["sku-popover--content-row"]}>
+              <span className={styles["sku-extra-api-element--container-info-container"]}>
+                <span className={styles["sku-extra-api-element--container-info"]}>
+                  <span>
+                    API
+                  </span>
+                </span>
+              </span>
+              <span className={styles["sku-popover--content-row--text"]}><span>&nbsp;</span><span>-</span><span>&nbsp;</span><span>SKU was gotten from the Nvidia store api, not being hardcoded</span></span>
+            </div>
+          </div>
+        </div>
+      );
     }
-  };
 
-  checkIfIsInData();
-
-  const handlePopoverContent = (element: "api" | "stock" | "link") => {
     if (element === "api") {
       return (
         <div className={styles["sku-popover--container"]}>
@@ -618,7 +655,16 @@ const GridTable = (props: GridTableProps) => {
 
   return (
     <div className={styles["sku-grid-table"]}>
-      <div className={styles["sku-grid-table--header"]}>Item</div>
+      <div className={styles["sku-grid-table--header"]}>
+        <span>Item</span>
+        <InlinePointerEnterAndLeaveWrapper
+          className={styles["sku-grid-table--header-icon"]}
+          popoverContent={handlePopoverContent("item")}
+          ariaLabel="Opens more info popup"
+        >
+          <QuestionMark className={styles["sku-grid-table--header-icon-icon"]} />
+        </InlinePointerEnterAndLeaveWrapper>
+      </div>
       <div className={styles["sku-grid-table--header"]}>
         <span>API Status</span>
         <InlinePointerEnterAndLeaveWrapper
@@ -653,6 +699,17 @@ const GridTable = (props: GridTableProps) => {
       </div>
       <div className={styles["sku-grid-table--header"]}><Notification /></div>
       {Object.values(skuData.country[country].skus).map(sku => (
+        <SKU
+          key={sku.skuName}
+          isActive={isActive}
+          skuName={sku.skuName}
+          gpuName={sku.gpuName}
+          isFromApi={sku.isFromApi}
+          isUpdated={sku.isUpdated}
+          locale={skuData.country[country].locale}
+        />
+      ))}
+      {updatedSkuList?.map(sku => (
         <SKU
           key={sku.skuName}
           isActive={isActive}
@@ -765,6 +822,7 @@ const Footer = (props: FooterProps) => {
 // if they differ from the list, update the sku names
 // offer user ability to manually override the sku name if empty list is returned
 // TODO: Make transparent color palette for better overlay element handling
+// TODO: Add Item column question mark icon explanation of update and api texts
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
   const [userSettings, setUserSettings] = useState<UserSettings>({
@@ -808,10 +866,45 @@ export default function Home() {
       }, 2000);
     }
 
+    if (window.Notification.permission === "granted") {
+      new window.Notification("RTX 5090 in stock");
+    }
     checkStock();
 
   }, [shouldRefresh, chosenCountry]);
 
+  // For dev purposes
+  // useEffect(() => {
+  //   async function checkStock() {
+  //     setApiSkuData({ isLoading: true, data: apiSkuData.data });
+  //     const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
+
+  //     if (!response.ok) {
+  //       const data: ErrorResponse = await response.json();
+
+  //       console.log(data)
+  //     } else {
+  //       const data = await response.json();
+  //       console.log("nvidia store data", data);
+  //       setApiSkuData({ isLoading: false, data: data.searchedProducts.productDetails });
+  //     }
+  //     // setApiSkuData((prevValue) => {
+  //     //   prevValue.isLoading = true;
+
+  //     //   return { ...prevValue };
+  //     // });
+
+  //     // setTimeout(() => {
+  //     //   setApiSkuData({ isLoading: false, data: mockApiResponseData })
+  //     // }, 2000);
+  //   }
+
+  //   // if (window.Notification.permission === "granted") {
+  //   //   new window.Notification("RTX 5090 in stock");
+  //   // }
+  //   checkStock();
+  // }, [chosenCountry]);
+  console.log("api data", apiSkuData);
   return (
     <>
       <main>

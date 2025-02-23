@@ -91,6 +91,7 @@ export const Switch = (props: SwitchProps) => {
       tabIndex={0}
       aria-labelledby={ariaLabelledBy}
       title={title}
+      aria-disabled={disabled}
     >
       <span  className={handleStyles("tack-container")}>
         <span className={handleStyles("tack")} />
