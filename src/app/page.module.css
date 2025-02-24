@@ -150,10 +150,6 @@
   align-items: center;
 }
 
-.timer-container--inner-container {
-
-}
-
 button.primary-button {
   padding: 10px;
 }
@@ -192,6 +188,7 @@ button.primary-button {
 .sku-popover--content-grid-container {
   display: grid;
   grid-template-columns: repeat(2, auto);
+  row-gap: 5px;
 }
 
 .sku-popover--content-row--text {

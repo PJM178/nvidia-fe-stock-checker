@@ -13,6 +13,7 @@ import {
   UserSettings
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 export const skuData = {
   baseUrl: (sku: string, locale: string) => {
@@ -307,7 +308,9 @@ const Timer = (props: TimerProps) => {
 };
 
 const LocaleBar = (props: LocaleBarProps) => {
-  const { isAlertActive, setIsAlertActive, setChosenCountry, setShouldRefresh } = props;
+  const { isAlertActive, setIsAlertActive, setChosenCountry, setShouldRefresh, chosenCountry } = props;
+  const router = useRouter();
+  const pathname = usePathname();
 
   const sortedCountries = Object.values(skuData.country).sort((a, b) => {
     const endonymA = a.endonym.toUpperCase();
@@ -333,7 +336,11 @@ const LocaleBar = (props: LocaleBarProps) => {
       }
 
       return prevValue;
-    })
+    });
+
+    if (country) {
+      router.push(pathname + "?country=" + country[0]);
+    }
   };
 
   const handleButtonClick = () => {
@@ -344,7 +351,7 @@ const LocaleBar = (props: LocaleBarProps) => {
     <div className={styles["locale-bar-container"]}>
       <select
         className={styles["locale-bar--select-menu"]}
-        defaultValue={"Suomi"}
+        defaultValue={skuData.country[chosenCountry].endonym}
         onChange={handleCountrySelect}
         aria-label="Select store country"
       >
@@ -820,11 +827,10 @@ const Footer = (props: FooterProps) => {
 
 // Check store api page for real sku names
 // if they differ from the list, update the sku names
-// offer user ability to manually override the sku name if empty list is returned
 // TODO: Make transparent color palette for better overlay element handling
-// TODO: Add Item column question mark icon explanation of update and api texts
 export default function Home() {
-  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>("finland");
+  const searchParams = useSearchParams();
+  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>(setInitialCountry());
   const [userSettings, setUserSettings] = useState<UserSettings>({
     theme: "system",
     notification: "default",
@@ -833,6 +839,21 @@ export default function Home() {
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, data: [] });
   console.log(Object.values(skuData.country[chosenCountry].skus));
+
+  function setInitialCountry(): keyof typeof skuData.country {
+    const searchParamsCountry = searchParams.get("country")
+
+    if (!!searchParamsCountry) {
+      const skuCountries = Object.keys(skuData.country);
+      const searchedCountry = skuCountries.find(country => country === searchParamsCountry);
+      
+      if (searchedCountry) {
+        return searchedCountry as keyof typeof skuData.country;
+      }
+    }
+
+    return "finland";
+  }
 
   useEffect(() => {
     setUserSettings({
@@ -904,6 +925,20 @@ export default function Home() {
   //   // }
   //   checkStock();
   // }, [chosenCountry]);
+
+  // Flash title when a product is in stock
+  // useEffect(() => {
+  //   const originalTitle = document.title;
+  //   const newTitle = "Product in stock!";
+
+  //   setInterval(() => {
+  //     if (document.title === originalTitle) {
+  //       document.title = newTitle;
+  //     } else {
+  //       document.title = originalTitle;
+  //     }
+  //   }, 500);
+  // }, []);
   console.log("api data", apiSkuData);
   return (
     <>
@@ -915,6 +950,7 @@ export default function Home() {
             setIsAlertActive={setIsAlertActive}
             isAlertActive={isAlertActive}
             setShouldRefresh={setShouldRefresh}
+            chosenCountry={chosenCountry}
           />
           <GridTable apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <Footer setUserSettings={setUserSettings} userSettings={userSettings} />

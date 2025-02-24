@@ -46,6 +46,7 @@ export interface LocaleBarProps {
   setIsAlertActive: React.Dispatch<React.SetStateAction<boolean>>;
   setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country>>;
   setShouldRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  chosenCountry: keyof typeof skuData.country;
 }
 
 export interface GridTableProps {
