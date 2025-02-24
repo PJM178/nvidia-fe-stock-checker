@@ -148,6 +148,10 @@ h1 {
   width: 25px;
 }
 
+.loading-icon {
+  fill: #9aa0a6;
+}
+
 button:focus-visible {
   outline-style: solid;
   outline-color: var(--brand);

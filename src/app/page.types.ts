@@ -7,6 +7,7 @@ export interface SKUProps {
   isActive: boolean;
   isUpdated: boolean;
   isFromApi: boolean;
+  apiSkuData: ApiSkuData;
 }
 
 export interface ResponseSkuData {
@@ -39,6 +40,8 @@ export interface SkuData {
 
 export interface TimerProps {
   setShouldRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  refreshTime: number;
+  isActive: boolean;
 }
 
 export interface LocaleBarProps {
@@ -57,6 +60,10 @@ export interface GridTableProps {
 
 export interface ApiSkuData {
   isLoading: boolean;
+  isError: {
+    error: boolean;
+    message: string;
+  };
   data: unknown[];
 }
 
