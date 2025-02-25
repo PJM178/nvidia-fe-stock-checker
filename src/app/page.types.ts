@@ -1,4 +1,4 @@
-import { skuData } from "./page";
+import { skuData } from "./data/sku";
 
 export interface SKUProps {
   gpuName: string;
