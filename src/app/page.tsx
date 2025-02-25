@@ -361,7 +361,7 @@ const LocaleBar = (props: LocaleBarProps) => {
         <span className={styles["timer-container--inner"]}>
           <span className={styles["timer-container--inner-container"]}>
             <span>Refresh in&nbsp;</span>
-            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={10} />s</span>
+            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={20} />s</span>
           </span>
         </span>
       </div>
@@ -396,12 +396,18 @@ const SKUExtraApiElement = (props: SKUExtraApiElementProps) => {
 };
 
 const SKU = (props: SKUProps) => {
-  const { gpuName, skuName, locale, isActive, isUpdated, isFromApi, apiSkuData } = props;
+  const { gpuName, skuName, locale, isActive, isUpdated, isFromApi, apiSkuData, updateGpusInStock } = props;
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(apiSkuData.isLoading);
 
   useEffect(() => {
+    if (apiSkuData.isLoading) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+
     if (isActive && isSelected.current && !apiSkuData.isLoading) {
       async function checkStock() {
         setIsLoading(true);
@@ -417,12 +423,24 @@ const SKU = (props: SKUProps) => {
           setResponseSkuData(data);
         }
 
-        setIsLoading(false);
+        setIsLoading(false)
       }
 
       checkStock();
     }
   }, [isActive, locale, skuName, apiSkuData]);
+
+  useEffect(() => {
+    if (responseSkuData && "success" in responseSkuData && responseSkuData.success && responseSkuData.listMap[0]?.is_active === "true" && responseSkuData.listMap[0]?.product_url.length > 0) {
+      if (window.Notification.permission === "granted") {
+        new window.Notification(`${gpuName} in stock!`);
+      }
+
+      updateGpusInStock({ inStock: true, gpu: gpuName });
+    } else {
+      updateGpusInStock({ inStock: false, gpu: gpuName });
+    }
+  }, [gpuName, responseSkuData, updateGpusInStock]);
 
   function handleSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
@@ -486,7 +504,14 @@ const SKU = (props: SKUProps) => {
           <SKUExtraApiElement isUpdated={isUpdated} isFromApi={isFromApi} />
         </span>
       </div>
-      <div className={styles["sku-grid-table--item"]}>{apiStatusElement()}</div>
+      <div className={styles["sku-grid-table--item"]}>
+        <span className={styles["sku-grid-table--item-api"]}>
+          <span className={isLoading ? "is-loading" : ""}>
+            {apiStatusElement()}
+          </span>
+          {isLoading && <ProgressActivity className="loading-icon" />}
+        </span>
+      </div>
       <div className={styles["sku-grid-table--item"]}>{inStockElement()}</div>
       <div className={styles["sku-grid-table--item"]}>{linkElement()}</div>
       <div className={styles["sku-grid-table--item"]}>
@@ -496,14 +521,13 @@ const SKU = (props: SKUProps) => {
           aria-label={gpuName}
         />
       </div>
-      <ProgressActivity className="loading-icon" />
     </div>
   );
 }
 
 const GridTable = (props: GridTableProps) => {
   const [updatedSkuList, setUpdatedSkuList] = useState<SkuData[] | null>(null);
-  const { isActive, country, apiSkuData } = props;
+  const { isActive, country, apiSkuData, updateGpusInStock } = props;
 
   useEffect(() => {
     function checkIfIsInData() {
@@ -695,6 +719,7 @@ const GridTable = (props: GridTableProps) => {
           isUpdated={sku.isUpdated}
           locale={skuData.country[country].locale}
           apiSkuData={apiSkuData}
+          updateGpusInStock={updateGpusInStock}
         />
       ))}
     </div>
@@ -808,7 +833,41 @@ export default function Home() {
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, isError: { error: false, message: "" }, data: [] });
-  console.log(Object.values(skuData.country[chosenCountry].skus));
+  const productInStockInterval = useRef<NodeJS.Timeout>(undefined);
+  const originalTitle = useRef("Nvidia FE Stock Checker");
+  const [gpusInStock, setGpusInStock] = useState<string[]>([]);
+
+  const updateGpusInStock = useCallback(({ inStock, gpu }: { inStock: boolean, gpu: string }) => {
+    setGpusInStock((prevValue) => {
+      if (inStock) {
+        if (!prevValue.includes(gpu)) {
+          return [...prevValue, gpu];
+        }
+      } else {
+        return prevValue.filter(value => value !== gpu);
+      }
+
+      return prevValue;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (gpusInStock.length > 0) {
+      clearInterval(productInStockInterval.current);
+
+      productInStockInterval.current = setInterval(() => {
+        if (document.title === originalTitle.current) {
+          document.title = gpusInStock.join(", ") + " in stock!";
+        } else {
+          document.title = originalTitle.current;
+        }
+      }, 500);
+    } else {
+      clearInterval(productInStockInterval.current);
+
+      document.title = originalTitle.current;
+    }
+  }, [gpusInStock]);
 
   function setInitialCountry(): keyof typeof skuData.country {
     const searchParamsCountry = searchParams.get("country")
@@ -853,27 +912,9 @@ export default function Home() {
       }
     }
 
-    // Implement this elsewhere
-    // if (window.Notification.permission === "granted") {
-    //   new window.Notification("RTX 5090 in stock");
-    // }
     checkStock();
   }, [chosenCountry, shouldRefresh]);
 
-  // Flash title when a product is in stock
-  // useEffect(() => {
-  //   const originalTitle = document.title;
-  //   const newTitle = "Product in stock!";
-
-  //   setInterval(() => {
-  //     if (document.title === originalTitle) {
-  //       document.title = newTitle;
-  //     } else {
-  //       document.title = originalTitle;
-  //     }
-  //   }, 500);
-  // }, []);
-  console.log("api data", apiSkuData);
   return (
     <>
       <main>
@@ -886,7 +927,7 @@ export default function Home() {
             setShouldRefresh={setShouldRefresh}
             chosenCountry={chosenCountry}
           />
-          <GridTable apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
+          <GridTable updateGpusInStock={updateGpusInStock} apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
         </div>
       </main>

@@ -8,6 +8,10 @@ export interface SKUProps {
   isUpdated: boolean;
   isFromApi: boolean;
   apiSkuData: ApiSkuData;
+  updateGpusInStock: ({ inStock, gpu }: {
+    inStock: boolean;
+    gpu: string;
+  }) => void;
 }
 
 export interface ResponseSkuData {
@@ -53,6 +57,10 @@ export interface LocaleBarProps {
 }
 
 export interface GridTableProps {
+  updateGpusInStock: ({ inStock, gpu }: {
+    inStock: boolean;
+    gpu: string;
+  }) => void;
   isActive: boolean;
   country: keyof typeof skuData.country;
   apiSkuData: ApiSkuData;

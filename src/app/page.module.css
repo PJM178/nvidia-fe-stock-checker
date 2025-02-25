@@ -82,6 +82,12 @@
   align-items: center;
 }
 
+.sku-grid-table--item-api {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .sku-response--error {
   border-radius: 5px;
   border: solid var(--error-stroke-strong) 2px;
