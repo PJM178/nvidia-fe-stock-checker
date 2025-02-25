@@ -448,6 +448,8 @@ const SKU = (props: SKUProps) => {
     } else {
       isSelected.current = false;
     }
+
+    console.log("test");
   }
 
   const apiStatusElement = () => {
