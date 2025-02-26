@@ -659,7 +659,7 @@ const GridTable = (props: GridTableProps) => {
         </InlinePointerEnterAndLeaveWrapper>
       </div>
       <div className={styles["sku-grid-table--header"]}><Notification /></div>
-      {updatedSkuList?.map(sku => (
+      {!apiSkuData.isCountryDataLoading && updatedSkuList?.map(sku => (
         <SKU
           key={sku.skuName}
           isActive={isActive}
@@ -782,10 +782,11 @@ export default function Home() {
   });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-  const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, isError: { error: false, message: "" }, data: [] });
+  const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, isError: { error: false, message: "" }, data: [], isCountryDataLoading: true });
   const productInStockInterval = useRef<NodeJS.Timeout>(undefined);
   const originalTitle = useRef("Nvidia FE Stock Checker");
   const [gpusInStock, setGpusInStock] = useState<string[]>([]);
+  const previousCountry = useRef(setInitialCountry());
 
   const updateGpusInStock = useCallback(({ inStock, gpu }: { inStock: boolean, gpu: string }) => {
     setGpusInStock((prevValue) => {
@@ -843,22 +844,24 @@ export default function Home() {
 
   useEffect(() => {
     async function checkStock() {
-      setApiSkuData((prevValue) => ({ ...prevValue, isLoading: true }));
+      setApiSkuData((prevValue) => ({ ...prevValue, isLoading: true, isCountryDataLoading: previousCountry.current !== chosenCountry }));
 
       try {
         const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
-
+        
+        previousCountry.current = chosenCountry;
+        
         if (!response.ok) {
           const data: ErrorResponse = await response.json();
 
-          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { ...data } }));
+          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { ...data }, isCountryDataLoading: false }));
         } else {
           const data = await response.json();
 
-          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, data: data.searchedProducts.productDetails }));
+          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, data: data.searchedProducts.productDetails, isCountryDataLoading: false }));
         }
       } catch (err) {
-        setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { error: true, message: err as string } }));
+        setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { error: true, message: err as string }, isCountryDataLoading: false }));
       }
     }
 

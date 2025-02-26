@@ -73,6 +73,7 @@ export interface ApiSkuData {
     message: string;
   };
   data: unknown[];
+  isCountryDataLoading: boolean;
 }
 
 export interface SKUExtraApiElementProps {
