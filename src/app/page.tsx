@@ -14,7 +14,7 @@ import {
   CountrySelectProps
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { skuData } from "./data/sku";
 import Skeleton from "./components/Skeleton";
 
@@ -239,8 +239,6 @@ const Timer = (props: TimerProps) => {
 const CountrySelect = (props: CountrySelectProps) => {
   const { setChosenCountry, chosenCountry } = props;
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     function setInitialCountry(): keyof typeof skuData.country {
@@ -292,7 +290,9 @@ const CountrySelect = (props: CountrySelectProps) => {
     });
 
     if (country) {
-      router.push(pathname + "?country=" + country[0]);
+      const params = new URLSearchParams(window.location.search);
+      params.set('country', country[0]);
+      window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
     }
   };
 
