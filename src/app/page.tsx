@@ -312,7 +312,7 @@ const LocaleBar = (props: LocaleBarProps) => {
         <span className={styles["timer-container--inner"]}>
           <span className={styles["timer-container--inner-container"]}>
             <span>Refresh in&nbsp;</span>
-            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={5} />s</span>
+            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={20} />s</span>
           </span>
         </span>
       </div>
