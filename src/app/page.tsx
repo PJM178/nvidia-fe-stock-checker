@@ -15,6 +15,7 @@ import {
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { skuData } from "./data/sku";
+import Skeleton from "./components/Skeleton";
 
 // const mockResponseDataSuccess = {
 //   listMap: [
@@ -882,6 +883,8 @@ export default function Home() {
           />
           <GridTable updateGpusInStock={updateGpusInStock} apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
+          <Skeleton variant="text" className={"skeleton-font-size-test"} height="20px" />
+          <Skeleton variant="circular" width="40px" height="40px" />
         </div>
       </main>
     </>
