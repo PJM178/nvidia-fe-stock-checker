@@ -48,12 +48,17 @@ export interface TimerProps {
   isActive: boolean;
 }
 
+export interface CountrySelectProps {
+  setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country | null>>;
+  chosenCountry: keyof typeof skuData.country | null;
+}
+
 export interface LocaleBarProps {
   isAlertActive: boolean;
   setIsAlertActive: React.Dispatch<React.SetStateAction<boolean>>;
-  setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country>>;
+  setChosenCountry: React.Dispatch<React.SetStateAction<keyof typeof skuData.country | null>>;
   setShouldRefresh: React.Dispatch<React.SetStateAction<boolean>>;
-  chosenCountry: keyof typeof skuData.country;
+  chosenCountry: keyof typeof skuData.country | null;
 }
 
 export interface GridTableProps {
@@ -62,7 +67,7 @@ export interface GridTableProps {
     gpu: string;
   }) => void;
   isActive: boolean;
-  country: keyof typeof skuData.country;
+  country: keyof typeof skuData.country | null;
   apiSkuData: ApiSkuData;
 }
 

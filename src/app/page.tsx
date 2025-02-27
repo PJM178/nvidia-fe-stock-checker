@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Suspense, useMemo } from "react";
 import styles from "./page.module.css";
 import { Notification, PlayArrow, QuestionMark, Settings, StopCircle, ProgressActivity } from "./components/Icons";
 import { Button, Switch } from "./components/Buttons";
@@ -10,7 +10,8 @@ import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
   GridTableProps, ApiSkuData, SKUExtraApiElementProps,
   FooterProps,
-  UserSettings
+  UserSettings,
+  CountrySelectProps
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
@@ -235,12 +236,36 @@ const Timer = (props: TimerProps) => {
   return timeLeft < 10 ? "0" + timeLeft : timeLeft;
 };
 
-const LocaleBar = (props: LocaleBarProps) => {
-  const { isAlertActive, setIsAlertActive, setChosenCountry, setShouldRefresh, chosenCountry } = props;
+const CountrySelect = (props: CountrySelectProps) => {
+  const { setChosenCountry, chosenCountry } = props;
+  const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const sortedCountries = Object.values(skuData.country).sort((a, b) => {
+  useEffect(() => {
+    function setInitialCountry(): keyof typeof skuData.country {
+      const searchParamsCountry = searchParams.get("country")
+
+      if (!!searchParamsCountry) {
+        const skuCountries = Object.keys(skuData.country);
+        const searchedCountry = skuCountries.find(country => country === searchParamsCountry);
+
+        if (searchedCountry) {
+          return searchedCountry as keyof typeof skuData.country;
+        }
+      }
+
+      return "finland";
+    }
+
+    setChosenCountry((prevValue) => {
+      prevValue = setInitialCountry();
+
+      return prevValue;
+    });
+  }, [searchParams, setChosenCountry]);
+
+  const sortedCountries = useMemo(() => Object.values(skuData.country).sort((a, b) => {
     const endonymA = a.endonym.toUpperCase();
     const endonymB = b.endonym.toUpperCase();
 
@@ -253,7 +278,7 @@ const LocaleBar = (props: LocaleBarProps) => {
     }
 
     return 0;
-  });
+  }), []);
 
   const handleCountrySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const country = Object.entries(skuData.country).find(([, value]) => value.endonym === e.target.value);
@@ -271,22 +296,45 @@ const LocaleBar = (props: LocaleBarProps) => {
     }
   };
 
+  return (
+    <select
+      className={styles["locale-bar--select-menu"]}
+      onChange={handleCountrySelect}
+      aria-label="Select store country"
+      style={!chosenCountry ? { width: "119px" } : undefined}
+      value={chosenCountry ? skuData.country[chosenCountry].endonym : ""}
+    >
+      {!chosenCountry ? <option>...loading</option> : sortedCountries.map(country => (
+        <option key={country.endonym}>{country.endonym}</option>
+      ))}
+    </select>
+  );
+};
+
+const LocaleBar = (props: LocaleBarProps) => {
+  const { isAlertActive, setIsAlertActive, setChosenCountry, setShouldRefresh, chosenCountry } = props;
+
   const handleButtonClick = () => {
     setIsAlertActive(!isAlertActive);
   };
 
   return (
     <div className={styles["locale-bar-container"]}>
-      <select
-        className={styles["locale-bar--select-menu"]}
-        defaultValue={skuData.country[chosenCountry].endonym}
-        onChange={handleCountrySelect}
-        aria-label="Select store country"
-      >
-        {sortedCountries.map(country => (
-          <option key={country.endonym}>{country.endonym}</option>
-        ))}
-      </select>
+      <Suspense fallback={
+        <select
+          className={styles["locale-bar--select-menu"]}
+          aria-label="Select store country"
+          style={!chosenCountry ? { width: "119px" } : undefined}
+          defaultValue={"...loading"}
+        >
+          <option>...loading</option>
+        </select>
+      }>
+        <CountrySelect
+          setChosenCountry={setChosenCountry}
+          chosenCountry={chosenCountry}
+        />
+      </Suspense>
       {!isAlertActive ?
         <>
           <Button
@@ -482,6 +530,8 @@ const GridTable = (props: GridTableProps) => {
 
   useEffect(() => {
     function checkIfIsInData() {
+      if (!country) return;
+
       if (!apiSkuData.isLoading) {
         const skuDataList = [...Object.values(skuData.country[country].skus)];
         let apiSkuDataList = apiSkuData.data;
@@ -661,7 +711,7 @@ const GridTable = (props: GridTableProps) => {
         </InlinePointerEnterAndLeaveWrapper>
       </div>
       <div className={styles["sku-grid-table--header"]}><Notification /></div>
-      {apiSkuData.isCountryDataLoading || !updatedSkuList ?
+      {apiSkuData.isCountryDataLoading || !updatedSkuList || !country ?
         Object.keys(skuData.country["finland"].skus).map(sku => (
           <div key={sku} className={styles["sku-grid-table--row"]}>
             <Skeleton variant="text" inlineStyles={{ justifySelf: "center", alignSelf: "center" }} />
@@ -786,8 +836,7 @@ const Footer = (props: FooterProps) => {
 // if they differ from the list, update the sku names
 // TODO: Make transparent color palette for better overlay element handling
 export default function Home() {
-  const searchParams = useSearchParams();
-  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country>(setInitialCountry());
+  const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country | null>(null);
   const [userSettings, setUserSettings] = useState<UserSettings>({
     theme: "system",
     notification: "default",
@@ -798,7 +847,7 @@ export default function Home() {
   const productInStockInterval = useRef<NodeJS.Timeout>(undefined);
   const originalTitle = useRef("Nvidia FE Stock Checker");
   const [gpusInStock, setGpusInStock] = useState<string[]>([]);
-  const previousCountry = useRef(setInitialCountry());
+  const previousCountry = useRef<string | null>(null);
 
   const updateGpusInStock = useCallback(({ inStock, gpu }: { inStock: boolean, gpu: string }) => {
     setGpusInStock((prevValue) => {
@@ -832,21 +881,6 @@ export default function Home() {
     }
   }, [gpusInStock]);
 
-  function setInitialCountry(): keyof typeof skuData.country {
-    const searchParamsCountry = searchParams.get("country")
-
-    if (!!searchParamsCountry) {
-      const skuCountries = Object.keys(skuData.country);
-      const searchedCountry = skuCountries.find(country => country === searchParamsCountry);
-
-      if (searchedCountry) {
-        return searchedCountry as keyof typeof skuData.country;
-      }
-    }
-
-    return "finland";
-  }
-
   useEffect(() => {
     setUserSettings({
       theme: localStorage.getItem("theme") as UserSettings["theme"] || "system",
@@ -856,24 +890,26 @@ export default function Home() {
 
   useEffect(() => {
     async function checkStock() {
-      setApiSkuData((prevValue) => ({ ...prevValue, isLoading: true, isCountryDataLoading: previousCountry.current !== chosenCountry }));
+      if (chosenCountry) {
+        setApiSkuData((prevValue) => ({ ...prevValue, isLoading: true, isCountryDataLoading: previousCountry.current !== chosenCountry }));
 
-      try {
-        const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
+        try {
+          const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
 
-        previousCountry.current = chosenCountry;
+          previousCountry.current = chosenCountry;
 
-        if (!response.ok) {
-          const data: ErrorResponse = await response.json();
+          if (!response.ok) {
+            const data: ErrorResponse = await response.json();
 
-          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { ...data }, isCountryDataLoading: false }));
-        } else {
-          const data = await response.json();
+            setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { ...data }, isCountryDataLoading: false }));
+          } else {
+            const data = await response.json();
 
-          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, data: data.searchedProducts.productDetails, isCountryDataLoading: false }));
+            setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, data: data.searchedProducts.productDetails, isCountryDataLoading: false }));
+          }
+        } catch (err) {
+          setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { error: true, message: err as string }, isCountryDataLoading: false }));
         }
-      } catch (err) {
-        setApiSkuData((prevValue) => ({ ...prevValue, isLoading: false, isError: { error: true, message: err as string }, isCountryDataLoading: false }));
       }
     }
 
