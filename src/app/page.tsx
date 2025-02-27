@@ -312,7 +312,7 @@ const LocaleBar = (props: LocaleBarProps) => {
         <span className={styles["timer-container--inner"]}>
           <span className={styles["timer-container--inner-container"]}>
             <span>Refresh in&nbsp;</span>
-            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={20} />s</span>
+            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={5} />s</span>
           </span>
         </span>
       </div>
@@ -533,6 +533,7 @@ const GridTable = (props: GridTableProps) => {
         setUpdatedSkuList(updatedSkuList);
       }
     };
+
     checkIfIsInData();
   }, [apiSkuData, country]);
 
@@ -613,7 +614,7 @@ const GridTable = (props: GridTableProps) => {
         </div>
       );
     }
-  }
+  };
 
   return (
     <div className={styles["sku-grid-table"]}>
@@ -660,19 +661,29 @@ const GridTable = (props: GridTableProps) => {
         </InlinePointerEnterAndLeaveWrapper>
       </div>
       <div className={styles["sku-grid-table--header"]}><Notification /></div>
-      {!apiSkuData.isCountryDataLoading && updatedSkuList?.map(sku => (
-        <SKU
-          key={sku.skuName}
-          isActive={isActive}
-          skuName={sku.skuName}
-          gpuName={sku.gpuName}
-          isFromApi={sku.isFromApi}
-          isUpdated={sku.isUpdated}
-          locale={skuData.country[country].locale}
-          apiSkuData={apiSkuData}
-          updateGpusInStock={updateGpusInStock}
-        />
-      ))}
+      {apiSkuData.isCountryDataLoading || !updatedSkuList ?
+        Object.keys(skuData.country["finland"].skus).map(sku => (
+          <div key={sku} className={styles["sku-grid-table--row"]}>
+            <Skeleton variant="text" inlineStyles={{ justifySelf: "center", alignSelf: "center" }} />
+            <Skeleton variant="rounded" width="29px" height="29px" inlineStyles={{ justifySelf: "center", alignSelf: "center" }} />
+            <Skeleton variant="rounded" width="29px" height="29px" inlineStyles={{ justifySelf: "center", alignSelf: "center" }} />
+            <Skeleton variant="text" inlineStyles={{ justifySelf: "center", alignSelf: "center" }} />
+            <Skeleton variant="rectangular" height="13px" width="13px" inlineStyles={{ justifySelf: "center", alignSelf: "center", borderRadius: "2px" }} />
+          </div>
+        )) :
+        updatedSkuList?.map(sku => (
+          <SKU
+            key={sku.skuName}
+            isActive={isActive}
+            skuName={sku.skuName}
+            gpuName={sku.gpuName}
+            isFromApi={sku.isFromApi}
+            isUpdated={sku.isUpdated}
+            locale={skuData.country[country].locale}
+            apiSkuData={apiSkuData}
+            updateGpusInStock={updateGpusInStock}
+          />
+        ))}
     </div>
   );
 };
@@ -849,9 +860,9 @@ export default function Home() {
 
       try {
         const response = await fetch(`https://api.nvidia.partners/edge/product/search?page=1&limit=12&locale=${skuData.country[chosenCountry].locale}&manufacturer=NVIDIA&manufacturer_filter=NVIDIA~2&category=GPU`);
-        
+
         previousCountry.current = chosenCountry;
-        
+
         if (!response.ok) {
           const data: ErrorResponse = await response.json();
 
@@ -883,8 +894,6 @@ export default function Home() {
           />
           <GridTable updateGpusInStock={updateGpusInStock} apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
           <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
-          <Skeleton variant="text" className={"skeleton-font-size-test"} height="20px" />
-          <Skeleton variant="circular" width="40px" height="40px" />
         </div>
       </main>
     </>

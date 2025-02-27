@@ -23,7 +23,7 @@
 .skeleton-base {
   width: 100%;
   height: auto;
-  background-color: rgba(255, 255, 255, 0.13);
+  background-color: var(--skeleton-loading-background);
   animation: 2000ms ease-in-out 500ms infinite normal none running skeletonPulse
 }
 
