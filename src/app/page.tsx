@@ -745,8 +745,27 @@ const GridTable = (props: GridTableProps) => {
 };
 
 const NotificationSoundSetting = () => {
+  const { userSettings, setUserSettings } = useUserSettings();
+
+  const handleSelectSoundNotification = () => {
+    setUserSettings((prevValue) => {
+      return { ...prevValue, audioSettings: { enabled: !prevValue.audioSettings.enabled, volume: prevValue.audioSettings.volume } };
+    });
+  };
+
   return (
-    null
+    <>
+      <div className={styles["footer-container--settings-menu--row"]}>
+        <span id="settings-sound-label">Send sound notification</span>
+        <span className={styles["footer-container--settings-menu--row-switch"]}>
+          <Switch
+            ariaLabelledBy="settings-sound-label"
+            isActive={userSettings.audioSettings.enabled}
+            onClick={handleSelectSoundNotification}
+          />
+        </span>
+      </div>
+    </>
   );
 };
 
@@ -811,6 +830,7 @@ const Footer = () => {
             />
           </span>
         </div>
+        <NotificationSoundSetting />
         <div className={styles["footer-container--settings-menu--row"]}>
           <span id="settings-theme-label">Select theme</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
