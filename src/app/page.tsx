@@ -8,29 +8,27 @@ import { useCountdown } from "./hooks/useCountdown";
 import { capitalizeFirstLetter, makeAbsoluteUrl } from "./utils/utilities";
 import {
   SKUProps, ResponseData, ErrorResponse, ApiResponse, SkuData, TimerProps, LocaleBarProps,
-  GridTableProps, ApiSkuData, SKUExtraApiElementProps,
-  FooterProps,
-  UserSettings,
-  CountrySelectProps
+  GridTableProps, ApiSkuData, SKUExtraApiElementProps, CountrySelectProps,
 } from "./page.types";
 import { InlinePointerEnterAndLeaveWrapper } from "./components/Wrappers";
 import { useSearchParams } from "next/navigation";
 import { skuData } from "./data/sku";
 import Skeleton from "./components/Skeleton";
+import { UserSettingsProvider, useUserSettings, UserSettings } from "./context/UserSettingsContext";
 
-// const mockResponseDataSuccess = {
-//   listMap: [
-//     {
-//       fe_sku: "string",
-//       is_active: "true",
-//       locale: "string",
-//       price: "string",
-//       product_url: "www.google.com",
-//     }
-//   ],
-//   map: null,
-//   success: true,
-// };
+const mockResponseDataSuccess = {
+  listMap: [
+    {
+      fe_sku: "string",
+      is_active: "true",
+      locale: "string",
+      price: "string",
+      product_url: "www.google.com",
+    }
+  ],
+  map: null,
+  success: true,
+};
 
 // const mockApiResponseData = [
 //   {
@@ -399,6 +397,13 @@ const SKU = (props: SKUProps) => {
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(apiSkuData.isLoading);
+  const soundSrc = "/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3";
+
+  const playSound = () => {
+    const audio = new Audio(soundSrc);
+
+    audio.play();
+  }
 
   useEffect(() => {
     if (apiSkuData.isLoading) {
@@ -419,7 +424,8 @@ const SKU = (props: SKUProps) => {
         } else {
           const data: ResponseData = await response.json();
 
-          setResponseSkuData(data);
+          // TODO: Put the real data back here after testing
+          setResponseSkuData((prevValue) => ({ prevValue, ...mockResponseDataSuccess }));
         }
 
         setIsLoading(false)
@@ -434,6 +440,8 @@ const SKU = (props: SKUProps) => {
       if (window.Notification.permission === "granted") {
         new window.Notification(`${gpuName} in stock!`);
       }
+
+      playSound();
 
       updateGpusInStock({ inStock: true, gpu: gpuName });
     } else {
@@ -738,9 +746,15 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
-const Footer = (props: FooterProps) => {
-  const { setUserSettings, userSettings } = props;
+const NotificationSoundSetting = () => {
+  return (
+    null
+  );
+};
+
+const Footer = () => {
   const themeOptions: UserSettings["theme"][] = ["system", "dark", "light"];
+  const { userSettings, setUserSettings } = useUserSettings();
 
   const handleThemeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as UserSettings["theme"];
@@ -837,10 +851,6 @@ const Footer = (props: FooterProps) => {
 // TODO: Make transparent color palette for better overlay element handling
 export default function Home() {
   const [chosenCountry, setChosenCountry] = useState<keyof typeof skuData.country | null>(null);
-  const [userSettings, setUserSettings] = useState<UserSettings>({
-    theme: "system",
-    notification: "default",
-  });
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [apiSkuData, setApiSkuData] = useState<ApiSkuData>({ isLoading: true, isError: { error: false, message: "" }, data: [], isCountryDataLoading: true });
@@ -848,6 +858,7 @@ export default function Home() {
   const originalTitle = useRef("Nvidia FE Stock Checker");
   const [gpusInStock, setGpusInStock] = useState<string[]>([]);
   const previousCountry = useRef<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const updateGpusInStock = useCallback(({ inStock, gpu }: { inStock: boolean, gpu: string }) => {
     setGpusInStock((prevValue) => {
@@ -882,13 +893,6 @@ export default function Home() {
   }, [gpusInStock]);
 
   useEffect(() => {
-    setUserSettings({
-      theme: localStorage.getItem("theme") as UserSettings["theme"] || "system",
-      notification: window.Notification.permission,
-    });
-  }, []);
-
-  useEffect(() => {
     async function checkStock() {
       if (chosenCountry) {
         setApiSkuData((prevValue) => ({ ...prevValue, isLoading: true, isCountryDataLoading: previousCountry.current !== chosenCountry }));
@@ -919,18 +923,25 @@ export default function Home() {
   return (
     <>
       <main>
-        <div className={styles["main-content-container"]}>
-          <h1>Nvidia FE Stock Checker</h1>
-          <LocaleBar
-            setChosenCountry={setChosenCountry}
-            setIsAlertActive={setIsAlertActive}
-            isAlertActive={isAlertActive}
-            setShouldRefresh={setShouldRefresh}
-            chosenCountry={chosenCountry}
-          />
-          <GridTable updateGpusInStock={updateGpusInStock} apiSkuData={apiSkuData} country={chosenCountry} isActive={isAlertActive} />
-          <Footer setUserSettings={setUserSettings} userSettings={userSettings} />
-        </div>
+        <UserSettingsProvider>
+          <div className={styles["main-content-container"]}>
+            <h1>Nvidia FE Stock Checker</h1>
+            <LocaleBar
+              setChosenCountry={setChosenCountry}
+              setIsAlertActive={setIsAlertActive}
+              isAlertActive={isAlertActive}
+              setShouldRefresh={setShouldRefresh}
+              chosenCountry={chosenCountry}
+            />
+            <GridTable
+              updateGpusInStock={updateGpusInStock}
+              apiSkuData={apiSkuData}
+              country={chosenCountry}
+              isActive={isAlertActive}
+            />
+            <Footer />
+          </div>
+        </UserSettingsProvider>
       </main>
     </>
   );

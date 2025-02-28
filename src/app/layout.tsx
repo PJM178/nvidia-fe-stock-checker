@@ -28,10 +28,12 @@ export default function RootLayout({
         <script id="theme">
           {`
             if (typeof window !== undefined) {
-              const theme = localStorage.getItem("theme");
+              const userSettings = localStorage.getItem("userSettings");
 
-              if (theme) {
-                document.documentElement.setAttribute("data-theme", theme);
+              const parsedUserSettings = JSON.parse(userSettings);
+
+              if (parsedUserSettings.theme) {
+                document.documentElement.setAttribute("data-theme", parsedUserSettings.theme);
               }
             }
           `}

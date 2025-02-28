@@ -85,13 +85,3 @@ export interface SKUExtraApiElementProps {
   isUpdated: boolean;
   isFromApi: boolean;
 }
-
-export type UserSettings = {
-  theme: "system" | "dark" | "light";
-  notification: typeof window.Notification.permission;
-};
-
-export interface FooterProps {
-  userSettings: UserSettings;
-  setUserSettings: React.Dispatch<React.SetStateAction<UserSettings>>;
-}
