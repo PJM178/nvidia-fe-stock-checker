@@ -164,6 +164,25 @@ button.primary-button {
   padding: 10px;
 }
 
+.locale-bar--select-menu.loading {
+  width: 139px;
+  padding: 10px;
+}
+
+@media only screen and (max-width: 600px) {
+
+  /* Styles for screens with width less than 600px */
+  .locale-bar--select-menu {
+    text-overflow: ellipsis;
+    max-width: 119px;
+  }
+
+  .locale-bar--select-menu.loading {
+    width: 119px;
+    padding: 10px;
+  }
+}
+
 .sku-grid-table--item-gpuname-container {
   position: relative;
 }

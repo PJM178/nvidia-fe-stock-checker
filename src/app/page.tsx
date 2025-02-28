@@ -296,10 +296,9 @@ const CountrySelect = (props: CountrySelectProps) => {
 
   return (
     <select
-      className={styles["locale-bar--select-menu"]}
+      className={`${styles["locale-bar--select-menu"]} ${!chosenCountry ? styles["loading"] : ""}`.trim()}
       onChange={handleCountrySelect}
       aria-label="Select store country"
-      style={!chosenCountry ? { width: "119px" } : undefined}
       value={chosenCountry ? skuData.country[chosenCountry].endonym : ""}
     >
       {!chosenCountry ? <option>...loading</option> : sortedCountries.map(country => (
@@ -320,9 +319,8 @@ const LocaleBar = (props: LocaleBarProps) => {
     <div className={styles["locale-bar-container"]}>
       <Suspense fallback={
         <select
-          className={styles["locale-bar--select-menu"]}
+          className={`${styles["locale-bar--select-menu"]} ${styles["loading"]}`.trim()}
           aria-label="Select store country"
-          style={!chosenCountry ? { width: "119px" } : undefined}
           defaultValue={"...loading"}
         >
           <option>...loading</option>

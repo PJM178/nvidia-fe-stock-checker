@@ -23,9 +23,7 @@ export const skuData = {
     },
     france: {
       endonym: "France",
-      skus: {
-
-      },
+      skus: {},
       locale: "fr-fr",
     },
     germany: {
@@ -45,6 +43,16 @@ export const skuData = {
         },
       },
       locale: "de-de",
+    },
+    sweden: {
+      endonym: "Sverige",
+      skus: {},
+      locale: "sv-se",
+    },
+    unitedKingdom: {
+      endonym: "United Kingdom",
+      skus: {},
+      locale: "en-gb",
     },
   },
 };
