@@ -12,6 +12,7 @@
 }
 
 @media (max-width: 600px) {
+
   /* Styles for screens with width less than 600px */
   .main-content-container {
     width: 100%;
@@ -266,13 +267,18 @@ button.primary-button {
   display: inline-flex;
 }
 
-.footer-container--settings:focus-visible > svg {
+.footer-container--settings:focus-visible>svg {
   animation: rotateIcon 1250ms linear infinite;
 }
 
 @keyframes rotateIcon {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .footer-container--settings-icon {
@@ -300,15 +306,47 @@ button.primary-button {
 .footer-container--settings-menu {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 .footer-container--settings-menu--row {
   display: flex;
   align-items: center;
+  transition: opacity 1.25s linear;
+}
+
+.footer-container--settings-menu--row.hidden {
+  align-items: center;
+  opacity: 0;
+}
+
+.footer-container--settings-menu--row.visible {
+  opacity: 1;
 }
 
 .footer-container--settings-menu--row-switch {
   margin-left: auto;
+}
+
+.footer-container--settings-menu--row-slider {
+  /* margin-left: auto; */
+  width: 40%;
+}
+
+.footer-container--settings-menu--row-slider-icon {
+  margin-left: auto;
+  display: inline-flex;
+}
+
+.footer-container--settings-menu--row-slider-icon:focus-visible {
+  outline-style: solid;
+  outline-color: var(--brand);
+  outline-offset: 2px;
+  outline-width: 2px;
+}
+
+.footer-container--settings-menu--row-slider-icon:focus-visible svg {
+  fill: var(--brand);
 }
 
 .footer-container--settings-menu-popover {

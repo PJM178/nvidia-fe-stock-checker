@@ -5,3 +5,4 @@ Very simple static site web app to check whether Nvidia Founders Edition cards a
 - Multiple country stores - currently: Finland, Germany, and France
 - Option to allow sending desktop notification when a gpu comes in stock
 - Flash title with the names of the gpus in stock
+- Accessible

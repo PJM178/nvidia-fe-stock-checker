@@ -7,14 +7,19 @@ interface InlinePointerEnterAndLeaveWrapperProps {
   popoverContent?: React.ReactNode;
   ariaLabel?: string;
   popoverClassName?: string;
+  callback?: () => void;
 }
 
 export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLeaveWrapperProps) => {
-  const { children, className, popoverContent, ariaLabel, popoverClassName } = props;
+  const { children, className, popoverContent, ariaLabel, popoverClassName, callback } = props;
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const elementRef = useRef<HTMLElement>(null);
 
   const handleClick = () => {
+    if (!!callback) {
+      return callback();
+    }
+
     setAnchorEl(elementRef.current);
   }
 
@@ -23,8 +28,8 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (e.ctrlKey && e.shiftKey) return;
-    
+    if (e.ctrlKey || e.shiftKey) return;
+
     if (anchorEl) {
       if (e.code === "Escape") {
         anchorEl.focus();
@@ -36,6 +41,10 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
     };
 
     if (e.code === "Enter" || e.code === "Space") {
+      if (!!callback) {
+        return callback();
+      }
+
       if (anchorEl) {
         return setAnchorEl(null);
       }

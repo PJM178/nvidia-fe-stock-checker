@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 export interface UserSettings {
   theme: "system" | "dark" | "light";
@@ -12,17 +12,23 @@ export interface UserSettings {
 interface UserSettingsContext {
   userSettings: UserSettings;
   setUserSettings: React.Dispatch<React.SetStateAction<UserSettings>>
+  audioRef: React.RefObject<HTMLAudioElement | null>;
 }
 
 const UserSettingsContext = createContext<UserSettingsContext | null>(null);
 
 export const UserSettingsProvider = ({ children }: { children: React.ReactNode }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [userSettings, setUserSettings] = useState<UserSettings>(() => {
     if (typeof window !== "undefined") {
       const savedSettings = localStorage.getItem("userSettings");
 
       if (savedSettings) {
         const parsedSavedSettings: UserSettings = JSON.parse(savedSettings);
+
+        if (parsedSavedSettings.audioSettings.enabled) {
+          audioRef.current = new Audio("/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3");
+        }
 
         return { ...parsedSavedSettings, notification: window.Notification.permission };
       }
@@ -50,7 +56,7 @@ export const UserSettingsProvider = ({ children }: { children: React.ReactNode }
       }
     );
   });
-
+  
   // Save settings to localStorage on change
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -59,7 +65,7 @@ export const UserSettingsProvider = ({ children }: { children: React.ReactNode }
   }, [userSettings]);
 
   return (
-    <UserSettingsContext.Provider value={{ userSettings, setUserSettings }}>
+    <UserSettingsContext.Provider value={{ userSettings, setUserSettings, audioRef }}>
       {children}
     </UserSettingsContext.Provider>
   );

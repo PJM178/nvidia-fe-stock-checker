@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, Suspense, useMemo } from "react";
 import styles from "./page.module.css";
-import { Notification, PlayArrow, QuestionMark, Settings, StopCircle, ProgressActivity } from "./components/Icons";
+import { Notification, BrandAwareness, PlayArrow, QuestionMark, Settings, StopCircle, ProgressActivity } from "./components/Icons";
 import { Button, Switch } from "./components/Buttons";
 import { useCountdown } from "./hooks/useCountdown";
 import { capitalizeFirstLetter, makeAbsoluteUrl } from "./utils/utilities";
@@ -391,17 +391,11 @@ const SKUExtraApiElement = (props: SKUExtraApiElementProps) => {
 };
 
 const SKU = (props: SKUProps) => {
+  const { audioRef } = useUserSettings();
   const { gpuName, skuName, locale, isActive, isUpdated, isFromApi, apiSkuData, updateGpusInStock } = props;
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(apiSkuData.isLoading);
-  const soundSrc = "/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3";
-
-  const playSound = () => {
-    const audio = new Audio(soundSrc);
-
-    audio.play();
-  }
 
   useEffect(() => {
     if (apiSkuData.isLoading) {
@@ -439,13 +433,15 @@ const SKU = (props: SKUProps) => {
         new window.Notification(`${gpuName} in stock!`);
       }
 
-      playSound();
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
 
       updateGpusInStock({ inStock: true, gpu: gpuName });
     } else {
       updateGpusInStock({ inStock: false, gpu: gpuName });
     }
-  }, [gpuName, responseSkuData, updateGpusInStock]);
+  }, [gpuName, responseSkuData, updateGpusInStock, audioRef]);
 
   function handleSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
@@ -744,13 +740,67 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
+// TODO: Transition animation of some sort for the volume slider
 const NotificationSoundSetting = () => {
-  const { userSettings, setUserSettings } = useUserSettings();
+  const { userSettings, setUserSettings, audioRef } = useUserSettings();
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const handleSelectSoundNotification = () => {
     setUserSettings((prevValue) => {
+      console.log(prevValue);
+      if (!prevValue.audioSettings.enabled) {
+        audioRef.current = new Audio("/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3");
+      } else {
+        audioRef.current = null;
+      }
+
       return { ...prevValue, audioSettings: { enabled: !prevValue.audioSettings.enabled, volume: prevValue.audioSettings.volume } };
     });
+  };
+
+  const handleSliderVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (audioRef.current) {
+      const volume = (+e.target.value / 100);
+
+      audioRef.current.volume = volume;
+    }
+  };
+
+  const handleSliderDispatchPointerUp = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+    const { value } = e.currentTarget;
+
+    setUserSettings((prevValue) => {
+      return { ...prevValue, audioSettings: { enabled: prevValue.audioSettings.enabled, volume: +value } };
+    });
+  };
+
+  // There may be different schemes of adjusting slider with different kinds of accessiblity settings
+  // so losing blur and then updating the state should capture most of them except the focus being there
+  // and the browser refreshing
+  const handleSliderOnBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => {
+    const { value } = e.currentTarget;
+
+    setUserSettings((prevValue) => {
+      return { ...prevValue, audioSettings: { enabled: prevValue.audioSettings.enabled, volume: +value } };
+    });
+  };
+
+  const handleTestAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.volume = userSettings.audioSettings.volume / 100;
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+  };
+
+  const handleSliderHeightTransition = () => {
+    console.log(sliderRef.current?.clientHeight);
+    if (sliderRef.current) {
+      sliderRef.current.addEventListener("transitionend", () => {
+
+      });
+    }
   };
 
   return (
@@ -764,6 +814,31 @@ const NotificationSoundSetting = () => {
             onClick={handleSelectSoundNotification}
           />
         </span>
+      </div>
+      <div
+        onTransitionEnd={() => console.log("lol")}
+        ref={sliderRef}
+        className={`${styles["footer-container--settings-menu--row"]} ${!userSettings.audioSettings.enabled ? styles["hidden"] : styles["visible"]}`.trim()}
+      >
+        <span id="settings-sound-volume-label">Adjust volume</span>
+        <InlinePointerEnterAndLeaveWrapper
+          className={styles["footer-container--settings-menu--row-slider-icon"]}
+          ariaLabel="Test audio volume"
+          callback={handleTestAudio}
+        >
+          <BrandAwareness className={styles["sku-grid-table--header-icon-icon"]} />
+        </InlinePointerEnterAndLeaveWrapper>
+        <input
+          className={styles["footer-container--settings-menu--row-slider"]}
+          type="range"
+          onChange={handleSliderVolume}
+          onPointerUp={handleSliderDispatchPointerUp}
+          onBlur={handleSliderOnBlur}
+          aria-labelledby="settings-sound-volume-label"
+          defaultValue={userSettings.audioSettings.volume}
+          min={0}
+          max={100}
+        />
       </div>
     </>
   );
