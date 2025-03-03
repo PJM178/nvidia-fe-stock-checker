@@ -740,11 +740,11 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
-// TODO: Transition animation of some sort for the volume slider - it should not be visible when audio notifications
-// are not enabled
 const NotificationSoundSetting = () => {
   const { userSettings, setUserSettings, audioRef } = useUserSettings();
   const sliderRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  const initialHeight = useRef<number>(undefined);
 
   const handleSelectSoundNotification = () => {
     setUserSettings((prevValue) => {
@@ -794,14 +794,29 @@ const NotificationSoundSetting = () => {
     }
   };
 
-  const handleSliderHeightTransition = () => {
-    console.log(sliderRef.current?.clientHeight);
+  const handleTransitionEnd = () => {
     if (sliderRef.current) {
-      sliderRef.current.addEventListener("transitionend", () => {
-
-      });
+      if (userSettings.audioSettings.enabled) {
+        sliderRef.current.style.visibility = "visible";
+      } else {
+        sliderRef.current.style.visibility = "hidden";
+      }
     }
   };
+
+  useEffect(() => {
+    if (userSettings.audioSettings.enabled) {
+      setHeight(initialHeight.current);
+    } else {
+      setHeight(0);
+    }
+  }, [userSettings.audioSettings.enabled]);
+
+  useEffect(() => {
+    if (sliderRef.current) {
+      initialHeight.current = sliderRef.current?.clientHeight;
+    }
+  }, []);
 
   return (
     <>
@@ -816,9 +831,12 @@ const NotificationSoundSetting = () => {
         </span>
       </div>
       <div
-        onTransitionEnd={() => console.log("lol")}
         ref={sliderRef}
-        className={`${styles["footer-container--settings-menu--row"]} ${!userSettings.audioSettings.enabled ? styles["hidden"] : styles["visible"]}`.trim()}
+        onTransitionEnd={handleTransitionEnd}
+        className={
+          `${styles["footer-container--settings-menu--row"]} ${!userSettings.audioSettings.enabled ? styles["hidden"] : styles["visible"]} ${height === undefined ? "" : styles["animate"]}`.trim()
+        }
+        style={{ height: `${height}px`, position: height === undefined && !userSettings.audioSettings.enabled ? "absolute" : "relative" }}
       >
         <span id="settings-sound-volume-label">Adjust volume</span>
         <InlinePointerEnterAndLeaveWrapper
@@ -907,7 +925,10 @@ const Footer = () => {
           </span>
         </div>
         <NotificationSoundSetting />
-        <div className={styles["footer-container--settings-menu--row"]}>
+        <div
+          className={styles["footer-container--settings-menu--row"]}
+          style={{ marginBottom: "unset" }}
+        >
           <span id="settings-theme-label">Select theme</span>
           <span className={styles["footer-container--settings-menu--row-switch"]}>
             <select

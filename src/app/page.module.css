@@ -306,22 +306,27 @@ button.primary-button {
 .footer-container--settings-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  width: max-content;
 }
 
 .footer-container--settings-menu--row {
   display: flex;
   align-items: center;
-  transition: opacity 1.25s linear;
+  margin-bottom: 0.5rem;
+}
+
+.footer-container--settings-menu--row.animate {
+  transition: opacity 100ms ease-in, height 200ms linear, margin-bottom 200ms linear;
 }
 
 .footer-container--settings-menu--row.hidden {
-  align-items: center;
   opacity: 0;
+  margin-bottom: 0;
 }
 
 .footer-container--settings-menu--row.visible {
   opacity: 1;
+  margin-bottom: 0.5rem;
 }
 
 .footer-container--settings-menu--row-switch {
@@ -329,8 +334,7 @@ button.primary-button {
 }
 
 .footer-container--settings-menu--row-slider {
-  /* margin-left: auto; */
-  width: 40%;
+  width: 80px;
 }
 
 .footer-container--settings-menu--row-slider-icon {
