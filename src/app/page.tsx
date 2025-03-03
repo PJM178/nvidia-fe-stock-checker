@@ -16,19 +16,19 @@ import { skuData } from "./data/sku";
 import Skeleton from "./components/Skeleton";
 import { UserSettingsProvider, useUserSettings, UserSettings } from "./context/UserSettingsContext";
 
-const mockResponseDataSuccess = {
-  listMap: [
-    {
-      fe_sku: "string",
-      is_active: "true",
-      locale: "string",
-      price: "string",
-      product_url: "www.google.com",
-    }
-  ],
-  map: null,
-  success: true,
-};
+// const mockResponseDataSuccess = {
+//   listMap: [
+//     {
+//       fe_sku: "string",
+//       is_active: "true",
+//       locale: "string",
+//       price: "string",
+//       product_url: "www.google.com",
+//     }
+//   ],
+//   map: null,
+//   success: true,
+// };
 
 // const mockApiResponseData = [
 //   {
