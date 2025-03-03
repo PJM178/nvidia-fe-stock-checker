@@ -356,7 +356,7 @@ const LocaleBar = (props: LocaleBarProps) => {
         <span className={styles["timer-container--inner"]}>
           <span className={styles["timer-container--inner-container"]}>
             <span>Refresh in&nbsp;</span>
-            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={20} />s</span>
+            <span><Timer isActive={isAlertActive} setShouldRefresh={setShouldRefresh} refreshTime={5} />s</span>
           </span>
         </span>
       </div>
@@ -407,16 +407,25 @@ const SKU = (props: SKUProps) => {
     if (isActive && isSelected.current && !apiSkuData.isLoading) {
       async function checkStock() {
         setIsLoading(true);
-        const response = await fetch(skuData.baseUrl(skuName, locale));
 
-        if (!response.ok) {
-          const data: ErrorResponse = await response.json();
+        try{
+          const response = await fetch(skuData.baseUrl(skuName, locale));
 
-          setResponseSkuData({ error: true, message: data.message });
-        } else {
-          const data: ResponseData = await response.json();
-
-          setResponseSkuData((prevValue) => ({ ...prevValue, ...data }));
+          if (!response.ok) {
+            const data: ErrorResponse = await response.json();
+  
+            setResponseSkuData({ error: true, message: data.message });
+          } else {
+            const data: ResponseData = await response.json();
+  
+            setResponseSkuData((prevValue) => ({ ...prevValue, ...data }));
+          }
+        } catch (err) {
+          if (err instanceof TypeError) {
+            setResponseSkuData({ error: true, message: err.message });
+          } else {
+            console.error(err);
+          }
         }
 
         setIsLoading(false)
