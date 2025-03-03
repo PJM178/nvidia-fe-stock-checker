@@ -44,6 +44,14 @@
   display: contents;
 }
 
+.sku-grid-table--row > .sku-grid-table--item:not(:has(input)) {
+  opacity: 0.5;
+}
+
+.sku-grid-table--row.checked > .sku-grid-table--item {
+  opacity: 1;
+}
+
 .sku-grid-table--header {
   display: flex;
   justify-content: center;

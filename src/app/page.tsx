@@ -396,6 +396,7 @@ const SKU = (props: SKUProps) => {
   const isSelected = useRef(false);
   const [responseSkuData, setResponseSkuData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(apiSkuData.isLoading);
+  const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (apiSkuData.isLoading) {
@@ -454,8 +455,10 @@ const SKU = (props: SKUProps) => {
   function handleSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.checked) {
       isSelected.current = true;
+      rowRef.current?.classList.add(styles["checked"]);
     } else {
       isSelected.current = false;
+      rowRef.current?.classList.remove(styles["checked"]);
     }
   }
 
@@ -506,7 +509,7 @@ const SKU = (props: SKUProps) => {
   }
 
   return (
-    <div className={styles["sku-grid-table--row"]}>
+    <div ref={rowRef} className={`${styles["sku-grid-table--row"]}`}>
       <div className={styles["sku-grid-table--item"]}>
         <span className={styles["sku-grid-table--item-gpuname-container"]}>
           <span>{gpuName}</span>
