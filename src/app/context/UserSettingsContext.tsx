@@ -28,6 +28,7 @@ export const UserSettingsProvider = ({ children }: { children: React.ReactNode }
 
         if (parsedSavedSettings.audioSettings.enabled) {
           audioRef.current = new Audio("/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3");
+          audioRef.current.volume = parsedSavedSettings.audioSettings.volume / 100;
         }
 
         return { ...parsedSavedSettings, notification: window.Notification.permission };
@@ -56,7 +57,7 @@ export const UserSettingsProvider = ({ children }: { children: React.ReactNode }
       }
     );
   });
-  
+
   // Save settings to localStorage on change
   useEffect(() => {
     if (typeof window !== "undefined") {

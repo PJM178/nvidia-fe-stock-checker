@@ -740,14 +740,14 @@ const GridTable = (props: GridTableProps) => {
   );
 };
 
-// TODO: Transition animation of some sort for the volume slider
+// TODO: Transition animation of some sort for the volume slider - it should not be visible when audio notifications
+// are not enabled
 const NotificationSoundSetting = () => {
   const { userSettings, setUserSettings, audioRef } = useUserSettings();
   const sliderRef = useRef<HTMLDivElement>(null);
 
   const handleSelectSoundNotification = () => {
     setUserSettings((prevValue) => {
-      console.log(prevValue);
       if (!prevValue.audioSettings.enabled) {
         audioRef.current = new Audio("/nvidia-fe-stock-checker/sounds/notification-alarm-sound.mp3");
       } else {
@@ -825,6 +825,7 @@ const NotificationSoundSetting = () => {
           className={styles["footer-container--settings-menu--row-slider-icon"]}
           ariaLabel="Test audio volume"
           callback={handleTestAudio}
+          title="Test audio volume"
         >
           <BrandAwareness className={styles["sku-grid-table--header-icon-icon"]} />
         </InlinePointerEnterAndLeaveWrapper>
@@ -951,7 +952,6 @@ export default function Home() {
   const originalTitle = useRef("Nvidia FE Stock Checker");
   const [gpusInStock, setGpusInStock] = useState<string[]>([]);
   const previousCountry = useRef<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const updateGpusInStock = useCallback(({ inStock, gpu }: { inStock: boolean, gpu: string }) => {
     setGpusInStock((prevValue) => {

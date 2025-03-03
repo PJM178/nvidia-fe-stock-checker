@@ -8,10 +8,11 @@ interface InlinePointerEnterAndLeaveWrapperProps {
   ariaLabel?: string;
   popoverClassName?: string;
   callback?: () => void;
+  title?: string;
 }
 
 export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLeaveWrapperProps) => {
-  const { children, className, popoverContent, ariaLabel, popoverClassName, callback } = props;
+  const { children, className, popoverContent, ariaLabel, popoverClassName, callback, title } = props;
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const elementRef = useRef<HTMLElement>(null);
 
@@ -63,6 +64,7 @@ export const InlinePointerEnterAndLeaveWrapper = (props: InlinePointerEnterAndLe
       aria-label={ariaLabel}
       aria-haspopup={popoverContent ? true : false}
       onKeyDown={handleKeyDown}
+      title={title}
     >
       {children}
       {popoverContent && anchorEl && <Popover popoverClassName={popoverClassName} anchorEl={anchorEl} onClose={onClose}>
