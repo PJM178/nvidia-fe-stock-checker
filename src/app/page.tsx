@@ -416,8 +416,7 @@ const SKU = (props: SKUProps) => {
         } else {
           const data: ResponseData = await response.json();
 
-          // TODO: Put the real data back here after testing
-          setResponseSkuData((prevValue) => ({ prevValue, ...mockResponseDataSuccess }));
+          setResponseSkuData((prevValue) => ({ ...prevValue, ...data }));
         }
 
         setIsLoading(false)
